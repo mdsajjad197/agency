@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import { Rocket, Github, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Rocket } from "lucide-react";
 
 export function Footer() {
   return (
@@ -19,20 +19,6 @@ export function Footer() {
             <p className="text-white/60 leading-relaxed max-w-xs">
               Transforming businesses with premium web design and development. Your digital vision, forged into reality.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary transition-colors">
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary transition-colors">
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary transition-colors">
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary transition-colors">
-                <Github className="w-4 h-4" />
-              </a>
-            </div>
           </div>
 
           <div>
