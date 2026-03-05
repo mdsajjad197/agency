@@ -2,8 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, doc, deleteDoc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare } from "lucide-react";
@@ -30,14 +30,14 @@ export default function BookingsManager() {
 
   const { data: bookings, isLoading } = useCollection(bookingsQuery);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Cancel this booking?")) return;
-    try {
-      await deleteDoc(doc(db, "bookings", id));
-      toast({ title: "Booking cancelled" });
-    } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
-    }
+    const docRef = doc(db, "bookings", id);
+    deleteDocumentNonBlocking(docRef);
+    toast({ 
+      title: "Cancellation requested", 
+      description: "The booking is being removed." 
+    });
   };
 
   const handleLogout = async () => {

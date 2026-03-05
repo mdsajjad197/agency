@@ -79,7 +79,12 @@ export default function BookingPage() {
                       <Calendar
                         mode="single"
                         selected={date}
-                        onSelect={setDate}
+                        onSelect={(newDate) => {
+                          // Prevent deselection by only updating if a date is actually clicked
+                          if (newDate) {
+                            setDate(newDate);
+                          }
+                        }}
                         className="rounded-md border bg-white mb-6"
                       />
                       <div className="grid grid-cols-2 gap-2">
