@@ -23,6 +23,8 @@ import Link from "next/link";
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,24 +51,35 @@ export default function BlogManagement() {
 
   const { data: posts, isLoading } = useCollection(postsQuery);
 
-  const handleDelete = async (postId: string) => {
+  const handleDelete = (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return;
 
-    try {
-      await deleteDoc(doc(db, "admin_blog_posts", postId));
-      // Also delete from public if it exists
-      await deleteDoc(doc(db, "public_blog_posts", postId));
-      toast({
-        title: "Post deleted",
-        description: "The blog post has been removed successfully.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to delete post: " + error.message,
-        variant: "destructive",
-      });
-    }
+    const adminRef = doc(db, "admin_blog_posts", postId);
+    const publicRef = doc(db, "public_blog_posts", postId);
+
+    // Delete from Master
+    deleteDoc(adminRef).catch(async () => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: adminRef.path,
+        operation: 'delete',
+      }));
+    });
+
+    // Delete from Public
+    deleteDoc(publicRef).catch(async (err: any) => {
+      // Only report if it's not a 'not-found' error
+      if (err.code !== 'not-found') {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: publicRef.path,
+          operation: 'delete',
+        }));
+      }
+    });
+
+    toast({
+      title: "Deletion initiated",
+      description: "The post removal is being processed.",
+    });
   };
 
   const handleLogout = async () => {
@@ -102,9 +115,9 @@ export default function BlogManagement() {
             <Inbox className="w-5 h-5" />
             Inquiries
           </Link>
-          <Link href="/admin/settings" className="flex items-center gap-3 p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+          <Link href="/admin/bookings" className="flex items-center gap-3 p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <Settings className="w-5 h-5" />
-            Settings
+            Bookings
           </Link>
         </nav>
 

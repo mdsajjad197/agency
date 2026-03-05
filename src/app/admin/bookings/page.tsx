@@ -21,7 +21,6 @@ export default function BookingsManager() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
-  const [deletingId, setDeletingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) router.push("/admin/login");
@@ -36,26 +35,20 @@ export default function BookingsManager() {
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
     
-    setDeletingId(id);
     const docRef = doc(db, "bookings", id);
 
     deleteDoc(docRef)
-      .then(() => {
-        toast({ 
-          title: "Booking cancelled", 
-          description: "The appointment has been removed successfully." 
-        });
-      })
       .catch(async (error) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'delete',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
-        setDeletingId(null);
+        }));
       });
+
+    toast({ 
+      title: "Cancellation initiated", 
+      description: "The appointment removal is being processed." 
+    });
   };
 
   const handleLogout = async () => {
@@ -141,15 +134,10 @@ export default function BookingsManager() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                      className="text-destructive hover:bg-destructive/10"
                       onClick={() => handleDelete(booking.id)}
-                      disabled={deletingId === booking.id}
                     >
-                      {deletingId === booking.id ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-5 h-5" />
-                      )}
+                      <Trash2 className="w-5 h-5" />
                     </Button>
                   </CardContent>
                 </Card>

@@ -12,6 +12,8 @@ import { useFirestore } from "@/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Clock, Loader2, Phone, MessageSquare } from "lucide-react";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function BookingPage() {
   const db = useFirestore();
@@ -22,7 +24,7 @@ export default function BookingPage() {
   const [success, setSuccess] = React.useState(false);
   const [form, setForm] = React.useState({ name: "", email: "", whatsapp: "" });
 
-  const handleBooking = async (e: React.FormEvent) => {
+  const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) {
       toast({ title: "Select a date", description: "Please pick a date for your session.", variant: "destructive" });
@@ -30,21 +32,28 @@ export default function BookingPage() {
     }
     
     setLoading(true);
-    try {
-      await addDoc(collection(db, "bookings"), {
-        clientName: form.name,
-        clientEmail: form.email,
-        whatsappNumber: form.whatsapp,
-        date: date.toISOString().split('T')[0],
-        time: time,
-        createdAt: new Date().toISOString()
+    const bookingData = {
+      clientName: form.name,
+      clientEmail: form.email,
+      whatsappNumber: form.whatsapp,
+      date: date.toISOString().split('T')[0],
+      time: time,
+      createdAt: new Date().toISOString()
+    };
+
+    addDoc(collection(db, "bookings"), bookingData)
+      .then(() => {
+        setSuccess(true);
+        setLoading(false);
+      })
+      .catch(async (error) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: 'bookings',
+          operation: 'create',
+          requestResourceData: bookingData,
+        }));
+        setLoading(false);
       });
-      setSuccess(true);
-    } catch (e: any) {
-      toast({ title: "Booking failed", description: e.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
   };
 
   const timeSlots = ["10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
@@ -83,7 +92,6 @@ export default function BookingPage() {
                         mode="single"
                         selected={date}
                         onSelect={(newDate) => {
-                          // Prevent deselection by only updating if a date is actually clicked
                           if (newDate) {
                             setDate(newDate);
                           }

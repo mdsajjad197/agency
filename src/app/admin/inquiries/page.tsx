@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function InquiriesManager() {
   const db = useFirestore();
@@ -30,23 +32,28 @@ export default function InquiriesManager() {
 
   const { data: inquiries, isLoading } = useCollection(inquiriesQuery);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Delete this inquiry?")) return;
-    try {
-      await deleteDoc(doc(db, "inquiries", id));
-      toast({ title: "Inquiry removed" });
-    } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
-    }
+    const docRef = doc(db, "inquiries", id);
+    deleteDoc(docRef).catch(async () => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'delete',
+      }));
+    });
+    toast({ title: "Removal initiated" });
   };
 
-  const handleStatusUpdate = async (id: string, status: string) => {
-    try {
-      await updateDoc(doc(db, "inquiries", id), { status });
-      toast({ title: "Status updated" });
-    } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
-    }
+  const handleStatusUpdate = (id: string, status: string) => {
+    const docRef = doc(db, "inquiries", id);
+    updateDoc(docRef, { status }).catch(async () => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'update',
+        requestResourceData: { status }
+      }));
+    });
+    toast({ title: "Status update initiated" });
   };
 
   const handleLogout = async () => {
