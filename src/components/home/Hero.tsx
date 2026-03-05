@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronDown, Sparkles, Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -11,75 +11,88 @@ export function Hero() {
   const heroImg = PlaceHolderImages.find(img => img.id === "hero-bg");
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Background patterns */}
-      <div className="absolute inset-0 -z-10 opacity-30">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
-      </div>
+    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-[#fcfcfc]">
+      {/* Background elements */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
 
-      <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-12 items-center">
-        <div className="space-y-8 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" />
-            Next-Gen Digital Solutions
+      <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-16 items-center">
+        <div className="lg:col-span-7 space-y-10 relative z-10 animate-fade-in-up">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white shadow-sm border border-border/50 text-primary text-xs font-bold uppercase tracking-widest">
+            <Sparkles className="w-3.5 h-3.5" />
+            Voted #1 Creative Agency 2024
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-headline font-bold leading-[1.1] text-foreground">
-            Forging <span className="text-primary">Exceptional</span> Digital Presence.
+          <h1 className="text-6xl md:text-8xl font-headline font-bold leading-[0.95] tracking-tight text-foreground">
+            Building the <br />
+            <span className="text-primary italic">unforgettable.</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
-            SS Studio transforms vague ideas into high-performance, smooth-animated websites that captivate and convert.
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed font-medium">
+            StudioForge partners with ambitious brands to forge high-performance digital experiences that lead the market.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Button size="lg" className="w-full sm:w-auto rounded-full text-lg h-14 px-8 group" asChild>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <Button size="lg" className="w-full sm:w-auto rounded-full text-lg h-16 px-10 group bg-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all" asChild>
               <Link href="#contact">
-                Start a Project
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Start My Project
+                <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full text-lg h-14 px-8" asChild>
-              <Link href="#portfolio">View Portfolio</Link>
-            </Button>
+            <button className="flex items-center gap-3 group text-lg font-bold hover:text-primary transition-colors">
+              <div className="w-12 h-12 rounded-full border-2 border-primary/20 flex items-center justify-center group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                <Play className="w-4 h-4 fill-current ml-1" />
+              </div>
+              Watch Showreel
+            </button>
           </div>
 
-          <div className="flex items-center gap-6 pt-4 grayscale opacity-60">
-            <div className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Trusted by:</div>
-            <div className="flex gap-4 items-center">
-              <span className="font-headline font-bold">STARTUPS</span>
-              <span className="font-headline font-bold">RETAIL</span>
-              <span className="font-headline font-bold">TECH</span>
+          <div className="flex items-center gap-10 pt-6 border-t border-border/40">
+            <div className="space-y-1">
+              <p className="text-2xl font-headline font-bold">150+</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Deployments</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-headline font-bold">4.9/5</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Client Rating</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-headline font-bold">99.9%</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Uptime Promise</p>
             </div>
           </div>
         </div>
 
-        <div className="relative aspect-square lg:aspect-auto lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-1000">
-          {heroImg && (
-            <Image
-              src={heroImg.imageUrl}
-              alt={heroImg.description}
-              fill
-              className="object-cover"
-              data-ai-hint={heroImg.imageHint}
-              priority
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
-          <div className="absolute bottom-8 left-8 p-6 bg-background/90 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl max-w-xs hidden sm:block">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-tight">Live Project Counter</span>
+        <div className="lg:col-span-5 relative">
+          <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-1000 ring-1 ring-black/5">
+            {heroImg && (
+              <Image
+                src={heroImg.imageUrl}
+                alt={heroImg.description}
+                fill
+                className="object-cover"
+                data-ai-hint={heroImg.imageHint}
+                priority
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent" />
+          </div>
+          
+          {/* Floating badge */}
+          <div className="absolute -bottom-6 -left-12 p-8 bg-white rounded-3xl shadow-2xl border border-border/50 max-w-xs animate-bounce-slow hidden xl:block">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex -space-x-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold">
+                    {String.fromCharCode(64 + i)}
+                  </div>
+                ))}
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-tighter">Join 200+ Partners</span>
             </div>
-            <p className="text-2xl font-headline font-bold">12 Active Builds</p>
-            <p className="text-sm text-muted-foreground">Delivering excellence every single day.</p>
+            <p className="font-headline font-bold text-lg leading-tight">Elevate your brand beyond the noise.</p>
           </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden md:block">
-        <ChevronDown className="w-6 h-6 text-muted-foreground" />
       </div>
     </section>
   );
