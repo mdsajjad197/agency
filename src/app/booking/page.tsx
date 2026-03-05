@@ -24,7 +24,10 @@ export default function BookingPage() {
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) return;
+    if (!date) {
+      toast({ title: "Select a date", description: "Please pick a date for your session.", variant: "destructive" });
+      return;
+    }
     
     setLoading(true);
     try {

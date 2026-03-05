@@ -2,16 +2,18 @@
 "use client";
 
 import * as React from "react";
-import { useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
-import { collection, query, orderBy, doc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare } from "lucide-react";
+import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function BookingsManager() {
   const db = useFirestore();
@@ -19,6 +21,7 @@ export default function BookingsManager() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const [deletingId, setDeletingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) router.push("/admin/login");
@@ -31,13 +34,28 @@ export default function BookingsManager() {
   const { data: bookings, isLoading } = useCollection(bookingsQuery);
 
   const handleDelete = (id: string) => {
-    if (!confirm("Cancel this booking?")) return;
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+    
+    setDeletingId(id);
     const docRef = doc(db, "bookings", id);
-    deleteDocumentNonBlocking(docRef);
-    toast({ 
-      title: "Cancellation requested", 
-      description: "The booking is being removed." 
-    });
+
+    deleteDoc(docRef)
+      .then(() => {
+        toast({ 
+          title: "Booking cancelled", 
+          description: "The appointment has been removed successfully." 
+        });
+      })
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setDeletingId(null);
+      });
   };
 
   const handleLogout = async () => {
@@ -45,7 +63,7 @@ export default function BookingsManager() {
     router.push("/admin/login");
   };
 
-  if (isUserLoading || !user) return <div className="p-20 text-center">Loading...</div>;
+  if (isUserLoading || !user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
@@ -90,10 +108,10 @@ export default function BookingsManager() {
 
           <div className="grid gap-4">
             {isLoading ? (
-              <div className="p-20 text-center">Loading...</div>
+              <div className="p-20 text-center">Loading appointments...</div>
             ) : bookings?.length ? (
               bookings.map((booking) => (
-                <Card key={booking.id} className="border-none shadow-sm rounded-2xl overflow-hidden">
+                <Card key={booking.id} className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
                   <CardContent className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex flex-col items-center justify-center">
@@ -123,17 +141,22 @@ export default function BookingsManager() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="text-destructive hover:bg-destructive/10"
+                      className="text-destructive hover:bg-destructive/10 disabled:opacity-50"
                       onClick={() => handleDelete(booking.id)}
+                      disabled={deletingId === booking.id}
                     >
-                      <Trash2 className="w-5 h-5" />
+                      {deletingId === booking.id ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-5 h-5" />
+                      )}
                     </Button>
                   </CardContent>
                 </Card>
               ))
             ) : (
               <div className="p-20 text-center bg-white rounded-3xl text-muted-foreground">
-                No upcoming bookings.
+                No upcoming bookings found.
               </div>
             )}
           </div>
