@@ -1,3 +1,9 @@
+git init
+git add .
+git commit -m "first commit: SS Studio with fixed hydration"
+git branch -M main
+git remote add origin https://github.com/mdsajjad197/agency.git
+git push -u origin main
 # SS Studio | Premium Creative Web Agency
 
 SS Studio is a high-performance digital agency specializing in E-commerce, Landing Pages, and custom UI/UX design. Built with a modern tech stack and integrated with Generative AI for project refinement.
