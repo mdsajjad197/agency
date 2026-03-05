@@ -29,6 +29,42 @@
       "description": "Vibrant organic produce store",
       "imageUrl": "https://picsum.photos/seed/fruit/800/600",
       "imageHint": "fruit shop"
+    },
+    {
+      "id": "service-ecommerce",
+      "description": "Modern e-commerce interface",
+      "imageUrl": "https://picsum.photos/seed/service-eco/600/400",
+      "imageHint": "minimalist shopping"
+    },
+    {
+      "id": "service-landing",
+      "description": "Clean landing page layout",
+      "imageUrl": "https://picsum.photos/seed/service-land/600/400",
+      "imageHint": "clean workspace"
+    },
+    {
+      "id": "service-static",
+      "description": "Sleek business website",
+      "imageUrl": "https://picsum.photos/seed/service-bus/600/400",
+      "imageHint": "modern architecture"
+    },
+    {
+      "id": "service-uiux",
+      "description": "Mobile app UI design",
+      "imageUrl": "https://picsum.photos/seed/service-ui/600/400",
+      "imageHint": "design studio"
+    },
+    {
+      "id": "service-animation",
+      "description": "Abstract fluid motion",
+      "imageUrl": "https://picsum.photos/seed/service-ani/600/400",
+      "imageHint": "abstract motion"
+    },
+    {
+      "id": "service-responsive",
+      "description": "Multi-device layout",
+      "imageUrl": "https://picsum.photos/seed/service-res/600/400",
+      "imageHint": "multiple devices"
     }
   ]
 }
