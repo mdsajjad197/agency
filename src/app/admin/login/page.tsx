@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -60,7 +61,7 @@ export default function AdminLogin() {
               <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Admin Email</label>
               <Input
                 type="email"
-                placeholder="admin@studioforge.com"
+                placeholder="sajjadsaffan634@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

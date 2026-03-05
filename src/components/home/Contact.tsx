@@ -52,7 +52,8 @@ export function Contact() {
     }
   };
 
-  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "+923000000000";
+  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "7845922005";
+  const agencyEmail = "sajjadsaffan634@gmail.com";
 
   if (submitted) {
     return (
@@ -91,7 +92,7 @@ export function Contact() {
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Email us</p>
-                  <p className="font-medium text-lg">hello@ssstudio.com</p>
+                  <p className="font-medium text-lg">{agencyEmail}</p>
                 </div>
               </div>
               
@@ -108,7 +109,7 @@ export function Contact() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <Button variant="outline" className="h-20 rounded-2xl border-none shadow-sm hover:shadow-md bg-white text-lg justify-start gap-4 px-6 group" asChild>
-                <a href={`https://wa.me/${agencyWhatsApp.replace(/\+/g, '')}`} target="_blank">
+                <a href={`https://wa.me/${agencyWhatsApp.replace(/[^0-9]/g, '')}`} target="_blank">
                   <div className="w-10 h-10 bg-[#25D366]/10 text-[#25D366] rounded-lg flex items-center justify-center group-hover:bg-[#25D366] group-hover:text-white transition-colors">
                     <MessageSquare className="w-5 h-5" />
                   </div>
@@ -158,7 +159,7 @@ export function Contact() {
                   <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp Number</label>
                   <div className="relative">
                     <Input 
-                      placeholder="+92 300 1234567" 
+                      placeholder="+91 78459 22005" 
                       className="bg-secondary/20 border-none h-12 pl-10"
                       value={formData.whatsappNumber}
                       onChange={(e) => setFormData({...formData, whatsappNumber: e.target.value})}

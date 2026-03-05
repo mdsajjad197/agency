@@ -50,7 +50,7 @@ export default function BookingPage() {
   };
 
   const timeSlots = ["10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
-  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "+923000000000";
+  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "7845922005";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -133,7 +133,7 @@ export default function BookingPage() {
                           <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp Number</label>
                           <div className="relative">
                             <Input 
-                              placeholder="+92 300 1234567" 
+                              placeholder="+91 78459 22005" 
                               required
                               className="bg-secondary/20 border-none h-12 pl-10"
                               value={form.whatsapp}
@@ -161,7 +161,7 @@ export default function BookingPage() {
               <div className="text-center space-y-4">
                 <p className="text-muted-foreground">Prefer a quick chat?</p>
                 <Button variant="outline" className="rounded-full h-12 gap-2" asChild>
-                  <a href={`https://wa.me/${agencyWhatsApp.replace(/\+/g, '')}`} target="_blank">
+                  <a href={`https://wa.me/${agencyWhatsApp.replace(/[^0-9]/g, '')}`} target="_blank">
                     <MessageSquare className="w-4 h-4 text-[#25D366]" />
                     Book via WhatsApp
                   </a>
