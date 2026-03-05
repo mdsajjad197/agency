@@ -43,16 +43,13 @@ export default function AdminSetup() {
 
       setStatus("assigning");
 
-      // Provision Admin Role in Firestore
-      await setDoc(doc(db, "roles", "admin", "adminUsers", user.uid), {
+      // Provision Admin Role in Firestore using a valid document path
+      // This document's existence grants isAdmin() privileges in firestore.rules
+      await setDoc(doc(db, "admin_roles", user.uid), {
         email: ADMIN_EMAIL,
         role: "super-admin",
+        active: true,
         initializedAt: new Date().toISOString()
-      }, { merge: true });
-
-      // Create separate role check doc as per the firestore.rules expected path
-      await setDoc(doc(db, "roles", "admin", user.uid), {
-        active: true
       }, { merge: true });
 
       // Create Admin Profile

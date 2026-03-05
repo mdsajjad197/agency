@@ -20,7 +20,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() && (
-        exists(/databases/$(database)/documents/roles/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid)) ||
         request.auth.token.email == "sajjadsaffan634@gmail.com"
       );
     }
@@ -41,7 +41,7 @@ service cloud.firestore {
       allow update, delete: if isOwner(adminUid) || isAdmin();
     }
 
-    match /roles/admin/{adminUid} {
+    match /admin_roles/{adminUid} {
       allow get, list: if isAdmin();
       allow create, update, delete: if isAdmin() || (isSignedIn() && request.auth.token.email == "sajjadsaffan634@gmail.com");
     }
