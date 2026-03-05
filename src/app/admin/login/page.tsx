@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Rocket, Loader2, Lock, ArrowRight } from "lucide-react";
+import { Rocket, Loader2, Lock } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
 
 export default function AdminLogin() {
   const [email, setEmail] = React.useState("");
@@ -93,16 +92,6 @@ export default function AdminLogin() {
                   </>
                 )}
               </Button>
-              
-              <div className="pt-4 border-t border-border flex flex-col gap-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">First time here?</p>
-                <Button variant="outline" className="w-full h-10 rounded-xl gap-2 text-xs" asChild>
-                  <Link href="/admin/setup">
-                    Initialize Admin Account
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </Button>
-              </div>
             </div>
           </form>
         </CardContent>
