@@ -17,11 +17,16 @@ import { CheckCircle, Clock, Loader2, Phone, MessageSquare } from "lucide-react"
 export default function BookingPage() {
   const db = useFirestore();
   const { toast } = useToast();
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
   const [time, setTime] = React.useState<string>("10:00 AM");
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [form, setForm] = React.useState({ name: "", email: "", whatsapp: "" });
+
+  React.useEffect(() => {
+    // Prevent hydration mismatch by setting the initial date on the client
+    setDate(new Date());
+  }, []);
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
