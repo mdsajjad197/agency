@@ -13,14 +13,14 @@ import {
   ArrowLeft, 
   Save, 
   Loader2, 
-  Image as ImageIcon,
+  FileText, 
   CheckCircle,
   LayoutDashboard,
-  FileText,
   Inbox,
   LogOut,
   Clock,
-  Upload
+  Upload,
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,7 @@ import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function NewPost() {
   const { user, isUserLoading } = useUser();
@@ -37,6 +38,7 @@ export default function NewPost() {
   const { toast } = useToast();
 
   const [loading, setLoading] = React.useState(false);
+  const [fileError, setFileError] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     title: "",
     slug: "",
@@ -56,7 +58,14 @@ export default function NewPost() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setFileError(null);
+
     if (file) {
+      if (file.size > 800000) { // Approx 800KB to stay safe within 1MB Firestore limit
+        setFileError("Image is too large. Please use a file under 800KB.");
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, featuredImageUrl: reader.result as string }));
@@ -158,12 +167,22 @@ export default function NewPost() {
 
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <h1 className="text-3xl font-headline font-bold">New Blog Post</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-3xl font-headline font-bold">New Blog Post</h1>
+            </div>
           </div>
+
+          {fileError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Image too large</AlertTitle>
+              <AlertDescription>{fileError}</AlertDescription>
+            </Alert>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -256,6 +275,7 @@ export default function NewPost() {
                           onChange={handleFileChange}
                         />
                       </div>
+                      <p className="text-[10px] text-muted-foreground text-center">Max 800KB for cloud sync compatibility.</p>
                       <div className="mt-4">
                         <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Or Image URL</label>
                         <Input
