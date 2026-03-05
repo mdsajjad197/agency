@@ -3,12 +3,12 @@
 
 import * as React from "react";
 import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Calendar, Mail, MapPin, Loader2, CheckCircle } from "lucide-react";
+import { MessageSquare, Calendar, Mail, MapPin, Loader2, CheckCircle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function Contact() {
@@ -20,6 +20,7 @@ export function Contact() {
   const [formData, setFormData] = React.useState({
     clientName: "",
     clientEmail: "",
+    whatsappNumber: "",
     serviceRequired: "E-commerce Development",
     message: ""
   });
@@ -50,6 +51,8 @@ export function Contact() {
       setLoading(false);
     }
   };
+
+  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "+923000000000";
 
   if (submitted) {
     return (
@@ -105,7 +108,7 @@ export function Contact() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <Button variant="outline" className="h-20 rounded-2xl border-none shadow-sm hover:shadow-md bg-white text-lg justify-start gap-4 px-6 group" asChild>
-                <a href="https://wa.me/yourwhatsappnumber" target="_blank">
+                <a href={`https://wa.me/${agencyWhatsApp.replace(/\+/g, '')}`} target="_blank">
                   <div className="w-10 h-10 bg-[#25D366]/10 text-[#25D366] rounded-lg flex items-center justify-center group-hover:bg-[#25D366] group-hover:text-white transition-colors">
                     <MessageSquare className="w-5 h-5" />
                   </div>
@@ -148,6 +151,19 @@ export function Contact() {
                       value={formData.clientEmail}
                       onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp Number</label>
+                  <div className="relative">
+                    <Input 
+                      placeholder="+92 300 1234567" 
+                      className="bg-secondary/20 border-none h-12 pl-10"
+                      value={formData.whatsappNumber}
+                      onChange={(e) => setFormData({...formData, whatsappNumber: e.target.value})}
+                    />
+                    <Phone className="w-4 h-4 absolute left-3 top-4 text-muted-foreground" />
                   </div>
                 </div>
                 

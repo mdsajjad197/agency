@@ -39,6 +39,7 @@
         "id": { "type": "string" },
         "clientName": { "type": "string" },
         "clientEmail": { "type": "string", "format": "email" },
+        "whatsappNumber": { "type": "string" },
         "message": { "type": "string" },
         "serviceRequired": { "type": "string" },
         "status": { "type": "string", "enum": ["new", "contacted", "converted"] },
@@ -54,6 +55,7 @@
         "id": { "type": "string" },
         "clientName": { "type": "string" },
         "clientEmail": { "type": "string", "format": "email" },
+        "whatsappNumber": { "type": "string" },
         "date": { "type": "string", "format": "date" },
         "time": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }

@@ -6,7 +6,7 @@ import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock } from "lucide-react";
+import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
@@ -102,11 +102,19 @@ export default function BookingsManager() {
                       </div>
                       <div className="space-y-1">
                         <h3 className="font-bold text-lg">{booking.clientName}</h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Mail className="w-4 h-4" />
-                          {booking.clientEmail}
-                        </p>
-                        <p className="text-xs font-bold text-primary flex items-center gap-1">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            {booking.clientEmail}
+                          </p>
+                          {booking.whatsappNumber && (
+                            <p className="text-sm text-[#25D366] font-medium flex items-center gap-2">
+                              <MessageSquare className="w-4 h-4" />
+                              {booking.whatsappNumber}
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-xs font-bold text-primary flex items-center gap-1 mt-1">
                           <Clock className="w-3 h-3" />
                           {booking.time}
                         </p>

@@ -6,12 +6,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, Clock, Loader2 } from "lucide-react";
+import { CheckCircle, Clock, Loader2, Phone, MessageSquare } from "lucide-react";
 
 export default function BookingPage() {
   const db = useFirestore();
@@ -20,7 +20,7 @@ export default function BookingPage() {
   const [time, setTime] = React.useState<string>("10:00 AM");
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-  const [form, setForm] = React.useState({ name: "", email: "" });
+  const [form, setForm] = React.useState({ name: "", email: "", whatsapp: "" });
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +31,7 @@ export default function BookingPage() {
       await addDoc(collection(db, "bookings"), {
         clientName: form.name,
         clientEmail: form.email,
+        whatsappNumber: form.whatsapp,
         date: date.toISOString().split('T')[0],
         time: time,
         createdAt: new Date().toISOString()
@@ -44,6 +45,7 @@ export default function BookingPage() {
   };
 
   const timeSlots = ["10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
+  const agencyWhatsApp = process.env.NEXT_PUBLIC_AGENCY_WHATSAPP || "+923000000000";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -65,74 +67,98 @@ export default function BookingPage() {
               <Button size="lg" className="rounded-full" onClick={() => window.location.href = "/"}>Return Home</Button>
             </Card>
           ) : (
-            <Card className="border-none shadow-2xl rounded-3xl overflow-hidden bg-white">
-              <CardContent className="p-0">
-                <div className="grid md:grid-cols-2">
-                  <div className="p-8 bg-primary/5 border-r">
-                    <h3 className="text-xl font-headline font-bold mb-6 flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-primary" />
-                      Pick Date & Time
-                    </h3>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="rounded-md border bg-white mb-6"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      {timeSlots.map(t => (
-                        <Button 
-                          key={t}
-                          variant={time === t ? "default" : "outline"}
-                          className="text-xs h-10"
-                          onClick={() => setTime(t)}
-                        >
-                          {t}
-                        </Button>
-                      ))}
+            <div className="space-y-8">
+              <Card className="border-none shadow-2xl rounded-3xl overflow-hidden bg-white">
+                <CardContent className="p-0">
+                  <div className="grid md:grid-cols-2">
+                    <div className="p-8 bg-primary/5 border-r">
+                      <h3 className="text-xl font-headline font-bold mb-6 flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-primary" />
+                        Pick Date & Time
+                      </h3>
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        className="rounded-md border bg-white mb-6"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        {timeSlots.map(t => (
+                          <Button 
+                            key={t}
+                            variant={time === t ? "default" : "outline"}
+                            className="text-xs h-10"
+                            onClick={() => setTime(t)}
+                          >
+                            {t}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="p-8 space-y-8">
+                      <h3 className="text-xl font-headline font-bold">Your Details</h3>
+                      <form onSubmit={handleBooking} className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Name</label>
+                          <Input 
+                            placeholder="John Doe" 
+                            required 
+                            className="bg-secondary/20 border-none h-12"
+                            value={form.name}
+                            onChange={e => setForm({...form, name: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email Address</label>
+                          <Input 
+                            type="email" 
+                            placeholder="john@example.com" 
+                            required 
+                            className="bg-secondary/20 border-none h-12"
+                            value={form.email}
+                            onChange={e => setForm({...form, email: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp Number</label>
+                          <div className="relative">
+                            <Input 
+                              placeholder="+92 300 1234567" 
+                              required
+                              className="bg-secondary/20 border-none h-12 pl-10"
+                              value={form.whatsapp}
+                              onChange={e => setForm({...form, whatsapp: e.target.value})}
+                            />
+                            <Phone className="w-4 h-4 absolute left-3 top-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                        <div className="pt-4">
+                          <Button type="submit" className="w-full h-14 text-lg rounded-xl" disabled={loading || !date}>
+                            {loading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Securing Slot...
+                              </>
+                            ) : "Confirm Booking"}
+                          </Button>
+                        </div>
+                      </form>
                     </div>
                   </div>
-                  
-                  <div className="p-8 space-y-8">
-                    <h3 className="text-xl font-headline font-bold">Your Details</h3>
-                    <form onSubmit={handleBooking} className="space-y-6">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Name</label>
-                        <Input 
-                          placeholder="John Doe" 
-                          required 
-                          className="bg-secondary/20 border-none h-12"
-                          value={form.name}
-                          onChange={e => setForm({...form, name: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email Address</label>
-                        <Input 
-                          type="email" 
-                          placeholder="john@example.com" 
-                          required 
-                          className="bg-secondary/20 border-none h-12"
-                          value={form.email}
-                          onChange={e => setForm({...form, email: e.target.value})}
-                        />
-                      </div>
-                      <div className="pt-4">
-                        <Button type="submit" className="w-full h-14 text-lg rounded-xl" disabled={loading || !date}>
-                          {loading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Securing Slot...
-                            </>
-                          ) : "Confirm Booking"}
-                        </Button>
-                      </div>
-                    </form>
-                    <p className="text-[10px] text-center text-muted-foreground italic">Consultations are usually 30-45 minutes via Google Meet.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <div className="text-center space-y-4">
+                <p className="text-muted-foreground">Prefer a quick chat?</p>
+                <Button variant="outline" className="rounded-full h-12 gap-2" asChild>
+                  <a href={`https://wa.me/${agencyWhatsApp.replace(/\+/g, '')}`} target="_blank">
+                    <MessageSquare className="w-4 h-4 text-[#25D366]" />
+                    Book via WhatsApp
+                  </a>
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       </main>

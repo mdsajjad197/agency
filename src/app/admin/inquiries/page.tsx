@@ -6,7 +6,7 @@ import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Inbox, Mail, User, Clock, Trash2, CheckCircle, LayoutDashboard, FileText, LogOut } from "lucide-react";
+import { Inbox, Mail, User, Clock, Trash2, CheckCircle, LayoutDashboard, FileText, LogOut, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
@@ -112,10 +112,18 @@ export default function InquiriesManager() {
                               <User className="w-4 h-4 text-primary" />
                               {lead.clientName}
                             </h3>
-                            <p className="text-sm text-muted-foreground flex items-center gap-2">
-                              <Mail className="w-4 h-4" />
-                              {lead.clientEmail}
-                            </p>
+                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                              <p className="flex items-center gap-2">
+                                <Mail className="w-4 h-4" />
+                                {lead.clientEmail}
+                              </p>
+                              {lead.whatsappNumber && (
+                                <p className="flex items-center gap-2 text-[#25D366] font-medium">
+                                  <MessageSquare className="w-4 h-4" />
+                                  {lead.whatsappNumber}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
                             lead.status === 'new' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
