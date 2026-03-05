@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useUser, useFirestore, useCollection } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,11 +43,11 @@ export default function BlogManagement() {
     }
   }, [user, isUserLoading, router]);
 
-  const postsQuery = React.useMemo(() => {
+  const postsQuery = useMemoFirebase(() => {
     return query(collection(db, "admin_blog_posts"), orderBy("createdAt", "desc"));
   }, [db]);
 
-  const { data: posts, isLoading } = useCollection(postsQuery as any);
+  const { data: posts, isLoading } = useCollection(postsQuery);
 
   const handleDelete = async (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return;

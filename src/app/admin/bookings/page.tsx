@@ -2,11 +2,11 @@
 "use client";
 
 import * as React from "react";
-import { useFirestore, useCollection } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, User, Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock } from "lucide-react";
+import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
@@ -24,11 +24,11 @@ export default function BookingsManager() {
     if (!isUserLoading && !user) router.push("/admin/login");
   }, [user, isUserLoading, router]);
 
-  const bookingsQuery = React.useMemo(() => {
+  const bookingsQuery = useMemoFirebase(() => {
     return query(collection(db, "bookings"), orderBy("date", "asc"));
   }, [db]);
 
-  const { data: bookings, isLoading } = useCollection(bookingsQuery as any);
+  const { data: bookings, isLoading } = useCollection(bookingsQuery);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Cancel this booking?")) return;

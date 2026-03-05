@@ -3,16 +3,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useUser, useFirestore, useCollection } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
   FileText, 
-  MessageSquare, 
   Plus, 
-  Settings, 
   LogOut,
   TrendingUp,
   Inbox,
@@ -33,13 +31,13 @@ export default function AdminDashboard() {
     if (!isUserLoading && !user) router.push("/admin/login");
   }, [user, isUserLoading, router]);
 
-  const postsQuery = React.useMemo(() => query(collection(db, "admin_blog_posts"), orderBy("createdAt", "desc"), limit(5)), [db]);
-  const inquiriesQuery = React.useMemo(() => query(collection(db, "inquiries"), orderBy("createdAt", "desc"), limit(5)), [db]);
-  const bookingsQuery = React.useMemo(() => query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(5)), [db]);
+  const postsQuery = useMemoFirebase(() => query(collection(db, "admin_blog_posts"), orderBy("createdAt", "desc"), limit(5)), [db]);
+  const inquiriesQuery = useMemoFirebase(() => query(collection(db, "inquiries"), orderBy("createdAt", "desc"), limit(5)), [db]);
+  const bookingsQuery = useMemoFirebase(() => query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(5)), [db]);
 
-  const { data: recentPosts } = useCollection(postsQuery as any);
-  const { data: recentInquiries } = useCollection(inquiriesQuery as any);
-  const { data: recentBookings } = useCollection(bookingsQuery as any);
+  const { data: recentPosts } = useCollection(postsQuery);
+  const { data: recentInquiries } = useCollection(inquiriesQuery);
+  const { data: recentBookings } = useCollection(bookingsQuery);
 
   if (isUserLoading || !user) return <div className="min-h-screen flex items-center justify-center"><TrendingUp className="animate-spin text-primary" /></div>;
 

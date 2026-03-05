@@ -2,11 +2,11 @@
 "use client";
 
 import * as React from "react";
-import { useFirestore, useCollection } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Inbox, Mail, User, Clock, Trash2, CheckCircle, LayoutDashboard, FileText, Settings, LogOut } from "lucide-react";
+import { Inbox, Mail, User, Clock, Trash2, CheckCircle, LayoutDashboard, FileText, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
@@ -24,11 +24,11 @@ export default function InquiriesManager() {
     if (!isUserLoading && !user) router.push("/admin/login");
   }, [user, isUserLoading, router]);
 
-  const inquiriesQuery = React.useMemo(() => {
+  const inquiriesQuery = useMemoFirebase(() => {
     return query(collection(db, "inquiries"), orderBy("createdAt", "desc"));
   }, [db]);
 
-  const { data: inquiries, isLoading } = useCollection(inquiriesQuery as any);
+  const { data: inquiries, isLoading } = useCollection(inquiriesQuery);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this inquiry?")) return;
@@ -58,7 +58,7 @@ export default function InquiriesManager() {
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
-      {/* Sidebar Sidebar */}
+      {/* Sidebar */}
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">

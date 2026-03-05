@@ -4,25 +4,24 @@
 import * as React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy } from "firebase/firestore";
-import { Card, CardContent } from "@/components/ui/card";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, User, Calendar } from "lucide-react";
+import { ArrowRight, Clock, Calendar, FileText } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function BlogFeed() {
   const db = useFirestore();
 
-  const blogQuery = React.useMemo(() => {
+  const blogQuery = useMemoFirebase(() => {
     return query(
       collection(db, "public_blog_posts"),
       orderBy("createdAt", "desc")
     );
   }, [db]);
 
-  const { data: posts, isLoading } = useCollection(blogQuery as any);
+  const { data: posts, isLoading } = useCollection(blogQuery);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -102,5 +101,3 @@ export default function BlogFeed() {
     </div>
   );
 }
-
-import { FileText } from "lucide-react";

@@ -4,19 +4,18 @@
 import * as React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { useFirestore, useCollection } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, limit } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock, Calendar, User, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Share2 } from "lucide-react";
 import Link from "next/link";
 
 export default function BlogPostDetail() {
   const { slug } = useParams();
   const db = useFirestore();
-  const router = useRouter();
 
-  const blogQuery = React.useMemo(() => {
+  const blogQuery = useMemoFirebase(() => {
     return query(
       collection(db, "public_blog_posts"),
       where("slug", "==", slug),
@@ -24,7 +23,7 @@ export default function BlogPostDetail() {
     );
   }, [db, slug]);
 
-  const { data: posts, isLoading } = useCollection(blogQuery as any);
+  const { data: posts, isLoading } = useCollection(blogQuery);
   const post = posts?.[0];
 
   if (isLoading) return <div className="p-40 text-center">Loading...</div>;
