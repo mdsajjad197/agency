@@ -6,8 +6,8 @@ export function Footer() {
   return (
     <footer className="bg-foreground text-white pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="space-y-6 col-span-1 lg:col-span-1">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
+          <div className="space-y-6 col-span-1">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
                 <Rocket className="text-white w-6 h-6" />
@@ -53,21 +53,6 @@ export function Footer() {
               <li><Link href="/blog" className="hover:text-primary transition-colors">Insights (Blog)</Link></li>
               <li><Link href="/booking" className="hover:text-primary transition-colors">Book a Call</Link></li>
             </ul>
-          </div>
-
-          <div className="space-y-6">
-            <h5 className="font-headline font-bold text-lg mb-6">Newsletter</h5>
-            <p className="text-white/60 text-sm">Get the latest digital trends and agency news.</p>
-            <div className="flex gap-2">
-              <input 
-                type="email" 
-                placeholder="email@example.com" 
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 flex-1 text-sm outline-none focus:border-primary"
-              />
-              <button className="bg-primary hover:bg-primary/90 text-white p-2 rounded-lg transition-colors">
-                <Rocket className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </div>
 
