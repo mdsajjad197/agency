@@ -1,8 +1,7 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -18,11 +17,6 @@ export function Hero() {
 
       <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-16 items-center">
         <div className="lg:col-span-7 space-y-10 relative z-10 animate-fade-in-up">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white shadow-sm border border-border/50 text-primary text-xs font-bold uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            Voted #1 Creative Agency 2024
-          </div>
-          
           <h1 className="text-6xl md:text-8xl font-headline font-bold leading-[0.95] tracking-tight text-foreground">
             Building the <br />
             <span className="text-primary italic">unforgettable.</span>
@@ -43,15 +37,15 @@ export function Hero() {
 
           <div className="flex items-center gap-10 pt-6 border-t border-border/40">
             <div className="space-y-1">
-              <p className="text-2xl font-headline font-bold">150+</p>
+              <p className="text-2xl font-headline font-bold">10+</p>
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Deployments</p>
             </div>
             <div className="space-y-1">
-              <p className="text-2xl font-headline font-bold">4.9/5</p>
+              <p className="text-2xl font-headline font-bold">3.5/5</p>
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Client Rating</p>
             </div>
             <div className="space-y-1">
-              <p className="text-2xl font-headline font-bold">99.9%</p>
+              <p className="text-2xl font-headline font-bold">90%</p>
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Uptime Promise</p>
             </div>
           </div>
