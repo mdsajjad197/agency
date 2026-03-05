@@ -3,69 +3,69 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "High-end digital agency background",
-      "imageUrl": "https://picsum.photos/seed/studio-hero-v2/1200/800",
+      "description": "High-end digital agency work environment",
+      "imageUrl": "https://picsum.photos/seed/studio-hero-v3/1200/800",
       "imageHint": "creative agency"
     },
     {
       "id": "project-mordenshop",
-      "description": "Premium minimalist fashion e-commerce",
-      "imageUrl": "https://picsum.photos/seed/morden/800/600",
-      "imageHint": "fashion ecommerce"
+      "description": "Premium minimalist fashion e-commerce solution",
+      "imageUrl": "https://picsum.photos/seed/morden-v2/800/600",
+      "imageHint": "premium ecommerce"
     },
     {
       "id": "project-ailearn",
       "description": "AI-driven educational platform interface",
-      "imageUrl": "https://picsum.photos/seed/ailearn/800/600",
-      "imageHint": "ai education"
+      "imageUrl": "https://picsum.photos/seed/ailearn-v2/800/600",
+      "imageHint": "smart technology"
     },
     {
       "id": "project-farmconnect",
-      "description": "Agricultural marketplace and community hub",
-      "imageUrl": "https://picsum.photos/seed/farm/800/600",
-      "imageHint": "agriculture marketplace"
+      "description": "Connected marketplace and community hub",
+      "imageUrl": "https://picsum.photos/seed/farm-v2/800/600",
+      "imageHint": "connected platform"
     },
     {
       "id": "project-fruitshop",
       "description": "Vibrant organic produce store",
-      "imageUrl": "https://picsum.photos/seed/fruit/800/600",
-      "imageHint": "fruit shop"
+      "imageUrl": "https://picsum.photos/seed/fruit-v2/800/600",
+      "imageHint": "organic store"
     },
     {
       "id": "service-ecommerce",
-      "description": "Modern e-commerce interface",
-      "imageUrl": "https://picsum.photos/seed/service-eco/600/400",
-      "imageHint": "premium ecommerce"
+      "description": "Scalable e-commerce solution for brands",
+      "imageUrl": "https://picsum.photos/seed/service-eco-v2/600/400",
+      "imageHint": "ecommerce solution"
     },
     {
       "id": "service-landing",
-      "description": "Clean landing page layout",
-      "imageUrl": "https://picsum.photos/seed/service-land/600/400",
-      "imageHint": "landing page"
+      "description": "Conversion-focused landing page design",
+      "imageUrl": "https://picsum.photos/seed/service-land-v2/600/400",
+      "imageHint": "problem solving"
     },
     {
       "id": "service-static",
-      "description": "Sleek business website",
-      "imageUrl": "https://picsum.photos/seed/service-bus/600/400",
-      "imageHint": "business website"
+      "description": "Professional business website architecture",
+      "imageUrl": "https://picsum.photos/seed/service-bus-v2/600/400",
+      "imageHint": "work solution"
     },
     {
       "id": "service-uiux",
-      "description": "Mobile app UI design",
-      "imageUrl": "https://picsum.photos/seed/service-ui/600/400",
-      "imageHint": "uiux design"
+      "description": "Strategic UI/UX design and research",
+      "imageUrl": "https://picsum.photos/seed/service-ui-v2/600/400",
+      "imageHint": "solution design"
     },
     {
       "id": "service-animation",
-      "description": "Abstract fluid motion",
-      "imageUrl": "https://picsum.photos/seed/service-ani/600/400",
-      "imageHint": "digital animation"
+      "description": "Dynamic fluid motion for web",
+      "imageUrl": "https://picsum.photos/seed/service-ani-v2/600/400",
+      "imageHint": "creative work"
     },
     {
       "id": "service-responsive",
-      "description": "Multi-device layout",
-      "imageUrl": "https://picsum.photos/seed/service-res/600/400",
-      "imageHint": "responsive web"
+      "description": "Seamless cross-device experience",
+      "imageUrl": "https://picsum.photos/seed/service-res-v2/600/400",
+      "imageHint": "expert solution"
     }
   ]
 }
