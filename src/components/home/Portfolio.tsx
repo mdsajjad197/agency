@@ -17,6 +17,7 @@ const projects = [
     description: "A premium minimalist fashion experience focused on high-conversion and fluid animations.",
     image: PlaceHolderImages.find(i => i.id === "project-mordenshop"),
     tags: ["Next.js", "Tailwind", "Framer"],
+    url: "https://mordenshop-1icm.vercel.app/",
   },
   {
     title: "AI Learn",
@@ -24,6 +25,7 @@ const projects = [
     description: "Interactive learning platform utilizing generative AI to personalize student curricula.",
     image: PlaceHolderImages.find(i => i.id === "project-ailearn"),
     tags: ["AI Integration", "React", "Node.js"],
+    url: "https://ai-learn-topaz.vercel.app",
   },
   {
     title: "Farm Connect",
@@ -31,6 +33,7 @@ const projects = [
     description: "Sustainability-focused platform connecting local farmers directly with urban consumers.",
     image: PlaceHolderImages.find(i => i.id === "project-farmconnect"),
     tags: ["Marketplace", "Maps API", "UI/UX"],
+    url: "https://farm-connect-cuye.vercel.app",
   },
   {
     title: "Fruit Shop",
@@ -38,6 +41,7 @@ const projects = [
     description: "A vibrant, lightning-fast digital storefront for organic, farm-fresh produce.",
     image: PlaceHolderImages.find(i => i.id === "project-fruitshop"),
     tags: ["Performance", "Visual Design"],
+    url: "https://fruit-shop-caz.vercel.app/",
   },
 ];
 
@@ -78,7 +82,12 @@ export function Portfolio() {
         <div className="grid md:grid-cols-2 gap-12">
           {filteredProjects.map((project, idx) => (
             <div key={idx} className="group relative space-y-6">
-              <div className="relative overflow-hidden rounded-[2.5rem] bg-secondary/20 aspect-[16/10] shadow-xl group-hover:shadow-2xl transition-all duration-500">
+              <a 
+                href={project.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block relative overflow-hidden rounded-[2.5rem] bg-secondary/20 aspect-[16/10] shadow-xl group-hover:shadow-2xl transition-all duration-500"
+              >
                 {project.image && (
                   <Image
                     src={project.image.imageUrl}
@@ -89,17 +98,24 @@ export function Portfolio() {
                   />
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                  <Button className="rounded-full h-16 w-16 bg-white text-black hover:bg-white/90">
+                  <div className="rounded-full h-16 w-16 bg-white text-black flex items-center justify-center shadow-lg">
                     <ArrowUpRight className="w-8 h-8" />
-                  </Button>
+                  </div>
                 </div>
-              </div>
+              </a>
               
               <div className="px-2 flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-3xl font-headline font-bold tracking-tight">
-                    {project.title}
-                  </h4>
+                  <a 
+                    href={project.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition-colors"
+                  >
+                    <h4 className="text-3xl font-headline font-bold tracking-tight">
+                      {project.title}
+                    </h4>
+                  </a>
                   <Badge variant="outline" className="rounded-full border-primary/20 text-primary">
                     {project.category}
                   </Badge>
@@ -120,12 +136,16 @@ export function Portfolio() {
         </div>
 
         <div className="mt-20 text-center">
-          <Button variant="outline" size="lg" className="rounded-full h-14 px-10 border-2 group">
-            View Case Studies
-            <ExternalLink className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
+          <Button variant="outline" size="lg" className="rounded-full h-14 px-10 border-2 group" asChild>
+            <Link href="#contact" className="flex items-center">
+              Request a Similar Project
+              <ExternalLink className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
+            </Link>
           </Button>
         </div>
       </div>
     </section>
   );
 }
+
+import Link from "next/link";
