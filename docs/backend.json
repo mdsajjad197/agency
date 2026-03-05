@@ -1,631 +1,75 @@
+
 {
   "entities": {
     "AdminUser": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "AdminUser",
       "type": "object",
-      "description": "Represents an administrator user account with permissions for managing content and leads within the StudioForge application. Authentication (passwords) is handled by an external system.",
+      "description": "Administrator account details.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the AdminUser entity."
-        },
-        "username": {
-          "type": "string",
-          "description": "A unique username for the administrator login."
-        },
-        "email": {
-          "type": "string",
-          "description": "The email address of the administrator.",
-          "format": "email"
-        },
-        "role": {
-          "type": "string",
-          "description": "The administrative role of the user, defining their access level (e.g., 'admin', 'editor')."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the admin user record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the admin user record was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "username",
-        "email",
-        "role",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["id", "username", "email", "role"]
     },
     "BlogPost": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "BlogPost",
       "type": "object",
-      "description": "Represents a single blog post published on the StudioForge website.",
+      "description": "Studio blog content.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BlogPost entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The main title of the blog post."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the blog post title."
-        },
-        "content": {
-          "type": "string",
-          "description": "The full content of the blog post, typically in Markdown or HTML format."
-        },
-        "excerpt": {
-          "type": "string",
-          "description": "A short summary or snippet of the blog post content, used for listings."
-        },
-        "featuredImageUrl": {
-          "type": "string",
-          "description": "URL of the main image displayed prominently with the blog post.",
-          "format": "uri"
-        },
-        "authorId": {
-          "type": "string",
-          "description": "Reference to the AdminUser who authored the blog post. (Relationship: AdminUser 1:N BlogPost)"
-        },
-        "categoryId": {
-          "type": "string",
-          "description": "Reference to the BlogCategory this post belongs to. (Relationship: BlogCategory 1:N BlogPost)"
-        },
-        "tagIds": {
-          "type": "array",
-          "description": "References to BlogTags associated with this post. (Relationship: BlogTag N:N BlogPost)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "publishedAt": {
-          "type": "string",
-          "description": "The date and time when the blog post was published.",
-          "format": "date-time"
-        },
-        "status": {
-          "type": "string",
-          "description": "The current publication status of the blog post (e.g., 'draft', 'published', 'archived')."
-        },
-        "seoTitle": {
-          "type": "string",
-          "description": "Title optimized for search engines."
-        },
-        "seoDescription": {
-          "type": "string",
-          "description": "Meta description optimized for search engines."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the blog post was first created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the blog post was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "featuredImageUrl": { "type": "string", "format": "uri" },
+        "authorId": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "title",
-        "slug",
-        "content",
-        "authorId",
-        "categoryId",
-        "publishedAt",
-        "status",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "BlogCategory": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BlogCategory",
-      "type": "object",
-      "description": "Defines a category for organizing blog posts.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BlogCategory entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the blog category (e.g., 'Web Development', 'UI/UX Design')."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the category name."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description of the blog category."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the category was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the category was last updated.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "slug",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "BlogTag": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BlogTag",
-      "type": "object",
-      "description": "Defines a tag for further categorization and filtering of blog posts.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BlogTag entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the blog tag (e.g., 'React', 'E-commerce', 'Design Trends')."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the tag name."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the tag was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the tag was last updated.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "slug",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "BlogComment": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BlogComment",
-      "type": "object",
-      "description": "Represents a comment made by a user on a blog post.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BlogComment entity."
-        },
-        "blogPostId": {
-          "type": "string",
-          "description": "Reference to the BlogPost this comment belongs to. (Relationship: BlogPost 1:N BlogComment)"
-        },
-        "authorName": {
-          "type": "string",
-          "description": "The name of the person who posted the comment."
-        },
-        "authorEmail": {
-          "type": "string",
-          "description": "The email address of the commenter (not used for authentication).",
-          "format": "email"
-        },
-        "content": {
-          "type": "string",
-          "description": "The actual text content of the comment."
-        },
-        "status": {
-          "type": "string",
-          "description": "The moderation status of the comment (e.g., 'pending', 'approved', 'spam')."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the comment was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the comment was last updated (e.g., status change).",
-          "format": "date-time"
-        },
-        "parentId": {
-          "type": "string",
-          "description": "Optional reference to a parent BlogComment, indicating this is a reply. (Relationship: BlogComment 1:N BlogComment)"
-        }
-      },
-      "required": [
-        "id",
-        "blogPostId",
-        "authorName",
-        "content",
-        "status",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "Project": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Project",
-      "type": "object",
-      "description": "Represents a portfolio project completed by SS Studio, showcasing their work.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Project entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title or name of the project."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the project title."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the project, its goals, and solutions."
-        },
-        "shortDescription": {
-          "type": "string",
-          "description": "A brief summary of the project, suitable for display cards or listings."
-        },
-        "clientName": {
-          "type": "string",
-          "description": "The name of the client for whom the project was completed."
-        },
-        "projectDate": {
-          "type": "string",
-          "description": "The completion date of the project.",
-          "format": "date"
-        },
-        "servicesProvided": {
-          "type": "array",
-          "description": "A list of services provided for this project (e.g., 'E-commerce website development', 'UI/UX design').",
-          "items": {
-            "type": "string"
-          }
-        },
-        "technologiesUsed": {
-          "type": "array",
-          "description": "A list of technologies and tools utilized in the project (e.g., 'Next.js', 'Tailwind CSS', 'MongoDB').",
-          "items": {
-            "type": "string"
-          }
-        },
-        "websiteUrl": {
-          "type": "string",
-          "description": "The URL to the live project website, if available.",
-          "format": "uri"
-        },
-        "caseStudyUrl": {
-          "type": "string",
-          "description": "The URL to a detailed case study document for the project, if available.",
-          "format": "uri"
-        },
-        "featuredImageUrl": {
-          "type": "string",
-          "description": "The URL of the primary image or thumbnail representing the project.",
-          "format": "uri"
-        },
-        "galleryImageUrls": {
-          "type": "array",
-          "description": "An array of URLs for additional images showcasing various aspects of the project.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "isFeatured": {
-          "type": "boolean",
-          "description": "A flag indicating if this project should be highlighted as a featured item in the portfolio."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the project record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the project record was last updated.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "slug",
-        "description",
-        "shortDescription",
-        "clientName",
-        "projectDate",
-        "servicesProvided",
-        "technologiesUsed",
-        "featuredImageUrl",
-        "isFeatured",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["id", "title", "slug", "content", "status", "createdAt"]
     },
     "Inquiry": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Inquiry",
       "type": "object",
-      "description": "Stores details of client inquiries and leads generated through contact forms, WhatsApp, or Calendly bookings.",
+      "description": "Client project leads.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Inquiry entity."
-        },
-        "clientName": {
-          "type": "string",
-          "description": "The full name of the prospective client."
-        },
-        "clientEmail": {
-          "type": "string",
-          "description": "The email address provided by the client for communication.",
-          "format": "email"
-        },
-        "clientPhone": {
-          "type": "string",
-          "description": "The phone number provided by the client, possibly for WhatsApp communication."
-        },
-        "companyName": {
-          "type": "string",
-          "description": "The name of the client's company or organization."
-        },
-        "message": {
-          "type": "string",
-          "description": "The detailed message or project brief from the client."
-        },
-        "serviceOfInterest": {
-          "type": "array",
-          "description": "A list of services the client is interested in (e.g., 'E-commerce website development', 'UI/UX design').",
-          "items": {
-            "type": "string"
-          }
-        },
-        "budgetRange": {
-          "type": "string",
-          "description": "The estimated budget range for the client's project (e.g., 'Under $5k', '$5k-$10k', 'Over $25k')."
-        },
-        "howHeardAboutUs": {
-          "type": "string",
-          "description": "Information on how the client discovered SS Studio (e.g., 'Google Search', 'Social Media', 'Referral')."
-        },
-        "preferredContactMethod": {
-          "type": "string",
-          "description": "The client's preferred method for initial contact (e.g., 'email', 'phone', 'whatsapp')."
-        },
-        "inquirySource": {
-          "type": "string",
-          "description": "The origin of the inquiry (e.g., 'contact_form', 'whatsapp', 'calendly_booking')."
-        },
-        "status": {
-          "type": "string",
-          "description": "The current status of the inquiry in the lead management pipeline (e.g., 'new', 'contacted', 'qualified', 'converted', 'lost')."
-        },
-        "scheduledCallDate": {
-          "type": "string",
-          "description": "The date and time of a consultation call scheduled via Calendly, if applicable.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the inquiry was first received.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the inquiry record was last updated (e.g., status change or notes added).",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientEmail": { "type": "string", "format": "email" },
+        "message": { "type": "string" },
+        "serviceRequired": { "type": "string" },
+        "status": { "type": "string", "enum": ["new", "contacted", "converted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "clientName",
-        "clientEmail",
-        "message",
-        "serviceOfInterest",
-        "inquirySource",
-        "status",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["id", "clientName", "clientEmail", "message", "status", "createdAt"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "type": "object",
+      "description": "Appointment bookings.",
+      "properties": {
+        "id": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientEmail": { "type": "string", "format": "email" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "clientName", "clientEmail", "date", "time", "createdAt"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password", "anonymous"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/adminUsers/{adminUid}",
-        "definition": {
-          "entityName": "adminUser",
-          "schema": {
-            "$ref": "#/backend/entities/AdminUser"
-          },
-          "description": "Stores profile data for admin users, where `{adminUid}` is the Firebase Authentication UID. Read/write access only for the matching `adminUid`.",
-          "params": [
-            {
-              "name": "adminUid",
-              "description": "The Firebase Authentication UID of the administrator user."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles/admin/{adminUid}",
-        "definition": {
-          "entityName": "adminUser",
-          "schema": {
-            "$ref": "#/backend/entities/AdminUser"
-          },
-          "description": "A dedicated collection for Database Access Control (DBAC). The existence of a document at this path (where `{adminUid}` is the `request.auth.uid`) grants full administrative privileges within Firestore rules. This enables Authorization Independence by avoiding `get()` calls on full user profiles for role checks.",
-          "params": [
-            {
-              "name": "adminUid",
-              "description": "The Firebase Authentication UID of the administrator, used for role checking."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/blogCategories/{categoryId}",
-        "definition": {
-          "entityName": "blogCategory",
-          "schema": {
-            "$ref": "#/backend/entities/BlogCategory"
-          },
-          "description": "Publicly accessible blog categories. Read access for all, write access for administrators. All documents share the same security posture for QAP compliance.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique identifier for a blog category."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/blogTags/{tagId}",
-        "definition": {
-          "entityName": "blogTag",
-          "schema": {
-            "$ref": "#/backend/entities/BlogTag"
-          },
-          "description": "Publicly accessible blog tags. Read access for all, write access for administrators. All documents share the same security posture for QAP compliance.",
-          "params": [
-            {
-              "name": "tagId",
-              "description": "The unique identifier for a blog tag."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/admin_blog_posts/{blogPostId}",
-        "definition": {
-          "entityName": "blogPost",
-          "schema": {
-            "$ref": "#/backend/entities/BlogPost"
-          },
-          "description": "The master collection for all blog posts, regardless of status (e.g., 'draft', 'published', 'archived'). This collection is managed by administrators, or the respective author. When a post is published, it is copied to `/public_blog_posts/{blogPostId}`. Includes denormalized 'authorId' for ownership checks, supporting Authorization Independence.",
-          "params": [
-            {
-              "name": "blogPostId",
-              "description": "The unique identifier for a blog post."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/public_blog_posts/{blogPostId}",
-        "definition": {
-          "entityName": "blogPost",
-          "schema": {
-            "$ref": "#/backend/entities/BlogPost"
-          },
-          "description": "Contains only 'published' blog posts. This collection is publicly readable by all users. It exists to satisfy QAPs by segregating public content from admin-managed drafts, ensuring list operations only return public data.",
-          "params": [
-            {
-              "name": "blogPostId",
-              "description": "The unique identifier for a publicly published blog post."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/admin_inbox/comments/{commentId}",
-        "definition": {
-          "entityName": "blogComment",
-          "schema": {
-            "$ref": "#/backend/entities/BlogComment"
-          },
-          "description": "A flat collection serving as an inbox for all new comments with 'pending' status. Any authenticated or anonymous user can create a comment here, but only administrators can read or update comments in this collection. It includes the denormalized 'blogPostId' field for context and Authorization Independence.",
-          "params": [
-            {
-              "name": "commentId",
-              "description": "The unique identifier for a blog comment in the admin moderation inbox."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/public_blog_posts/{blogPostId}/comments/{commentId}",
-        "definition": {
-          "entityName": "blogComment",
-          "schema": {
-            "$ref": "#/backend/entities/BlogComment"
-          },
-          "description": "A nested collection storing only 'approved' comments associated with a specific blog post. This collection is publicly readable. When a comment is approved in `/admin_inbox/comments`, it is copied here. The `blogPostId` is derived from the path and also denormalized in the document for query flexibility and Authorization Independence.",
-          "params": [
-            {
-              "name": "blogPostId",
-              "description": "The unique identifier of the parent blog post."
-            },
-            {
-              "name": "commentId",
-              "description": "The unique identifier for an approved blog comment."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/projects/{projectId}",
-        "definition": {
-          "entityName": "project",
-          "schema": {
-            "$ref": "#/backend/entities/Project"
-          },
-          "description": "Portfolio projects of SS Studio. All projects are publicly readable, while write access is restricted to administrators. All documents share the same security posture for QAP compliance.",
-          "params": [
-            {
-              "name": "projectId",
-              "description": "The unique identifier for a portfolio project."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/inquiries/{inquiryId}",
-        "definition": {
-          "entityName": "inquiry",
-          "schema": {
-            "$ref": "#/backend/entities/Inquiry"
-          },
-          "description": "Stores all client inquiries and leads. This collection is exclusively accessible by administrators for reading and updating. Any authenticated or anonymous user can create new inquiries here. All documents share the same admin-only security posture for QAP compliance.",
-          "params": [
-            {
-              "name": "inquiryId",
-              "description": "The unique identifier for a client inquiry."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore data structure is designed with a strong emphasis on Authorization Independence and Quality Assurance Predicates (QAPs) to ensure robust security rules and efficient data access, particularly for blog management and an admin panel. \n\n**Authorization Independence via Denormalization:**\n\n1.  **Admin Roles (DBAC):** Instead of relying on a `get()` operation to fetch an admin user's role from their profile document, a dedicated collection `/roles/admin/{adminUid}` is used. The mere *existence* of a document at this path (where `adminUid` matches `request.auth.uid`) grants administrative privileges. This eliminates `get()` calls for global role checks, making rules atomic and easier to debug, directly supporting the DBAC principle and Authorization Independence.\n2.  **Ownership:** For entities like `BlogPost`, the `authorId` is directly included within the `BlogPost` document (`/admin_blog_posts/{blogPostId}`). This allows rules to check `request.auth.uid == resource.data.authorId` without needing to perform `get()` operations on parent documents.\n3.  **Nested Data Context:** For `BlogComment`s, the `blogPostId` is denormalized and stored directly on the comment document itself (e.g., in `/admin_inbox/comments/{commentId}`), despite also being implied by the path in `/public_blog_posts/{blogPostId}/comments/{commentId}`. This ensures that any comment can be easily associated with its parent blog post without complex lookups in security rules.\n\n**QAPs (Rules are not Filters) through Structural Segregation:**\n\nThis design strictly adheres to the principle that Firestore rules cannot filter results of a `list` operation. To achieve this, collections are segregated based on their security posture and publication status:\n\n1.  **Blog Posts:**\n    *   `/public_blog_posts/{blogPostId}`: This collection contains *only* blog posts with `status: 'published'`. It is publicly readable by everyone. A `list` operation here will only ever return published content, fully satisfying QAPs.\n    *   `/admin_blog_posts/{blogPostId}`: This serves as the master collection for blog posts, containing all statuses (`draft`, `published`, `archived`). It is accessible only by administrators and the respective `authorId`. When a post's status is changed to `published` by an admin, it is copied to the `/public_blog_posts` collection. This clear separation ensures that public listings never expose drafts.\n2.  **Blog Comments:**\n    *   `/public_blog_posts/{blogPostId}/comments/{commentId}`: This nested subcollection stores *only* `approved` comments for a specific blog post. It is publicly readable. Similar to blog posts, a `list` operation against this path will only yield approved comments, adhering to QAPs.\n    *   `/admin_inbox/comments/{commentId}`: This is a flat, admin-only collection dedicated to new comments with a `pending` status. Any user (even anonymous) can create a comment here, but only administrators can read or update these comments. Upon approval by an admin, a comment is copied from this inbox to its respective `/public_blog_posts/{blogPostId}/comments/{commentId}` subcollection.\n\n**Other Principles:**\n\n*   **Clarity of Intent:** Path names like `/admin_blog_posts` and `/public_blog_posts` explicitly communicate the intended access level.\n*   **Structural Segregation:** Beyond blog posts and comments, entities like `BlogCategory`, `BlogTag`, `Project` are placed in single, top-level collections because all documents within them share the same security posture (public read, admin write). `Inquiry` is an admin-only collection.\n*   **Explicit State Modeling:** All relevant entities (e.g., `BlogPost`, `BlogComment`, `Inquiry`) utilize a single `status` field to clearly define their current state, making rules logic straightforward.\n*   **Radical Consistency:** Wildcards are descriptive (e.g., `{blogPostId}`, `{adminUid}`), and standard fields like `authorId` are used.\n\nThis architecture minimizes rule complexity, enhances debuggability, and directly addresses the security and scalability requirements by adhering strictly to the core design principles and strategy mandates."
+    "/adminUsers/{uid}": { "schema": "AdminUser", "description": "Admin profiles" },
+    "/admin_roles/{uid}": { "schema": "object", "description": "Authorization flags" },
+    "/public_blog_posts/{postId}": { "schema": "BlogPost", "description": "Live articles" },
+    "/admin_blog_posts/{postId}": { "schema": "BlogPost", "description": "Master articles" },
+    "/inquiries/{id}": { "schema": "Inquiry", "description": "Leads" },
+    "/bookings/{id}": { "schema": "Booking", "description": "Appointments" }
   }
 }

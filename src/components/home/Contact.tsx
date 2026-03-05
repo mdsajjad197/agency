@@ -1,18 +1,70 @@
 
 "use client";
 
+import * as React from "react";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Calendar, Mail, MapPin, ExternalLink } from "lucide-react";
+import { MessageSquare, Calendar, Mail, MapPin, Loader2, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function Contact() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const db = useFirestore();
+  const { toast } = useToast();
+  const [loading, setLoading] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState(false);
+
+  const [formData, setFormData] = React.useState({
+    clientName: "",
+    clientEmail: "",
+    serviceRequired: "E-commerce Development",
+    message: ""
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate submission
-    alert("Thanks! We've received your inquiry. (Lead stored in mock database)");
+    setLoading(true);
+
+    try {
+      await addDoc(collection(db, "inquiries"), {
+        ...formData,
+        status: "new",
+        createdAt: new Date().toISOString()
+      });
+      
+      setSubmitted(true);
+      toast({
+        title: "Inquiry Sent!",
+        description: "We'll get back to you within 24 hours.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Submission failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (submitted) {
+    return (
+      <section className="py-24 bg-secondary/10 flex items-center justify-center min-h-[500px]">
+        <div className="text-center space-y-6 max-w-md p-8 bg-white rounded-3xl shadow-xl">
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle className="w-8 h-8" />
+          </div>
+          <h3 className="text-3xl font-headline font-bold">Message Received</h3>
+          <p className="text-muted-foreground">Thank you for reaching out, {formData.clientName}! Sajjad and the team will review your project brief shortly.</p>
+          <Button variant="outline" onClick={() => setSubmitted(false)} className="rounded-full">Send another message</Button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="contact" className="py-24 bg-secondary/10">
@@ -61,7 +113,7 @@ export function Contact() {
                 </a>
               </Button>
               <Button variant="outline" className="h-20 rounded-2xl border-none shadow-sm hover:shadow-md bg-white text-lg justify-start gap-4 px-6 group" asChild>
-                <a href="https://calendly.com/yourlink" target="_blank">
+                <a href="/booking">
                   <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
                     <Calendar className="w-5 h-5" />
                   </div>
@@ -78,17 +130,34 @@ export function Contact() {
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Name</label>
-                    <Input placeholder="John Doe" required className="bg-secondary/20 border-none h-12" />
+                    <Input 
+                      placeholder="John Doe" 
+                      required 
+                      className="bg-secondary/20 border-none h-12"
+                      value={formData.clientName}
+                      onChange={(e) => setFormData({...formData, clientName: e.target.value})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
-                    <Input type="email" placeholder="john@example.com" required className="bg-secondary/20 border-none h-12" />
+                    <Input 
+                      type="email" 
+                      placeholder="john@example.com" 
+                      required 
+                      className="bg-secondary/20 border-none h-12"
+                      value={formData.clientEmail}
+                      onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+                    />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Service Required</label>
-                  <select className="w-full h-12 rounded-md bg-secondary/20 border-none px-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                  <select 
+                    className="w-full h-12 rounded-md bg-secondary/20 border-none px-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={formData.serviceRequired}
+                    onChange={(e) => setFormData({...formData, serviceRequired: e.target.value})}
+                  >
                     <option>E-commerce Development</option>
                     <option>Landing Page</option>
                     <option>Static Business Website</option>
@@ -99,11 +168,22 @@ export function Contact() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Message</label>
-                  <Textarea placeholder="Tell us more about your project goals..." required className="bg-secondary/20 border-none min-h-[120px]" />
+                  <Textarea 
+                    placeholder="Tell us more about your project goals..." 
+                    required 
+                    className="bg-secondary/20 border-none min-h-[120px]"
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  />
                 </div>
 
-                <Button type="submit" className="w-full h-14 text-lg rounded-xl">
-                  Send Message
+                <Button type="submit" className="w-full h-14 text-lg rounded-xl" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : "Send Message"}
                 </Button>
               </form>
             </CardContent>
