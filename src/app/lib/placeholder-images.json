@@ -5,7 +5,7 @@
       "id": "hero-bg",
       "description": "High-end digital agency background",
       "imageUrl": "https://picsum.photos/seed/studio-hero-v2/1200/800",
-      "imageHint": "minimalist technology"
+      "imageHint": "creative agency"
     },
     {
       "id": "project-mordenshop",
@@ -35,37 +35,37 @@
       "id": "service-ecommerce",
       "description": "Modern e-commerce interface",
       "imageUrl": "https://picsum.photos/seed/service-eco/600/400",
-      "imageHint": "minimalist shopping"
+      "imageHint": "premium ecommerce"
     },
     {
       "id": "service-landing",
       "description": "Clean landing page layout",
       "imageUrl": "https://picsum.photos/seed/service-land/600/400",
-      "imageHint": "clean workspace"
+      "imageHint": "landing page"
     },
     {
       "id": "service-static",
       "description": "Sleek business website",
       "imageUrl": "https://picsum.photos/seed/service-bus/600/400",
-      "imageHint": "modern architecture"
+      "imageHint": "business website"
     },
     {
       "id": "service-uiux",
       "description": "Mobile app UI design",
       "imageUrl": "https://picsum.photos/seed/service-ui/600/400",
-      "imageHint": "design studio"
+      "imageHint": "uiux design"
     },
     {
       "id": "service-animation",
       "description": "Abstract fluid motion",
       "imageUrl": "https://picsum.photos/seed/service-ani/600/400",
-      "imageHint": "abstract motion"
+      "imageHint": "digital animation"
     },
     {
       "id": "service-responsive",
       "description": "Multi-device layout",
       "imageUrl": "https://picsum.photos/seed/service-res/600/400",
-      "imageHint": "multiple devices"
+      "imageHint": "responsive web"
     }
   ]
 }
