@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { name: "Services", href: "#services" },
-  { name: "Portfolio", href: "#portfolio" },
-  { name: "Process", href: "#process" },
-  { name: "AI Refiner", href: "#ai-refiner" },
+  { name: "Services", href: "/#services" },
+  { name: "Portfolio", href: "/#portfolio" },
+  { name: "Blog", href: "/blog" },
+  { name: "Book a Call", href: "/booking" },
 ];
 
 export function Navbar() {
@@ -55,7 +55,7 @@ export function Navbar() {
             </Link>
           ))}
           <Button asChild className="rounded-full px-6">
-            <Link href="#contact">Hire Us</Link>
+            <Link href="/#contact">Hire Us</Link>
           </Button>
         </div>
 
@@ -83,7 +83,7 @@ export function Navbar() {
             </Link>
           ))}
           <Button asChild className="w-full mt-4" onClick={() => setIsOpen(false)}>
-            <Link href="#contact">Hire Us</Link>
+            <Link href="/#contact">Hire Us</Link>
           </Button>
         </div>
       )}

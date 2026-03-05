@@ -38,20 +38,20 @@ export function Footer() {
           <div>
             <h5 className="font-headline font-bold text-lg mb-6">Services</h5>
             <ul className="space-y-4 text-white/60">
-              <li><Link href="#services" className="hover:text-primary transition-colors">E-commerce</Link></li>
-              <li><Link href="#services" className="hover:text-primary transition-colors">Landing Pages</Link></li>
-              <li><Link href="#services" className="hover:text-primary transition-colors">Static Websites</Link></li>
-              <li><Link href="#services" className="hover:text-primary transition-colors">UI/UX Design</Link></li>
+              <li><Link href="/#services" className="hover:text-primary transition-colors">E-commerce</Link></li>
+              <li><Link href="/#services" className="hover:text-primary transition-colors">Landing Pages</Link></li>
+              <li><Link href="/#services" className="hover:text-primary transition-colors">Static Websites</Link></li>
+              <li><Link href="/#services" className="hover:text-primary transition-colors">UI/UX Design</Link></li>
             </ul>
           </div>
 
           <div>
             <h5 className="font-headline font-bold text-lg mb-6">Company</h5>
             <ul className="space-y-4 text-white/60">
-              <li><Link href="#portfolio" className="hover:text-primary transition-colors">Portfolio</Link></li>
-              <li><Link href="#process" className="hover:text-primary transition-colors">Our Process</Link></li>
-              <li><Link href="#contact" className="hover:text-primary transition-colors">Contact</Link></li>
-              <li><Link href="#ai-refiner" className="hover:text-primary transition-colors">AI Workshop</Link></li>
+              <li><Link href="/#portfolio" className="hover:text-primary transition-colors">Portfolio</Link></li>
+              <li><Link href="/#process" className="hover:text-primary transition-colors">Our Process</Link></li>
+              <li><Link href="/blog" className="hover:text-primary transition-colors">Insights (Blog)</Link></li>
+              <li><Link href="/booking" className="hover:text-primary transition-colors">Book a Call</Link></li>
             </ul>
           </div>
 
