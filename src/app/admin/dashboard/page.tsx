@@ -56,10 +56,10 @@ export default function AdminDashboard() {
           <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
             <LayoutDashboard className="w-5 h-5 text-white" />
           </div>
-          <span className="font-headline font-bold text-xl">AdminForge</span>
+          <span className="font-headline font-bold text-xl">SS Studio</span>
         </div>
         <nav className="flex-1 space-y-2">
-          <Link href="/admin/dashboard" className="flex items-center gap-3 p-3 bg-primary rounded-xl text-white">
+          <Link href="/admin/dashboard" className="flex items-center gap-3 bg-primary rounded-xl text-white">
             <LayoutDashboard className="w-5 h-5" />
             Dashboard
           </Link>
