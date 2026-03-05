@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Sparkles, Play } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -29,7 +29,7 @@ export function Hero() {
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed font-medium">
-            StudioForge partners with ambitious brands to forge high-performance digital experiences that lead the market.
+            SS Studio partners with ambitious brands to forge high-performance digital experiences that lead the market.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -39,12 +39,6 @@ export function Hero() {
                 <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
-            <button className="flex items-center gap-3 group text-lg font-bold hover:text-primary transition-colors">
-              <div className="w-12 h-12 rounded-full border-2 border-primary/20 flex items-center justify-center group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
-                <Play className="w-4 h-4 fill-current ml-1" />
-              </div>
-              Watch Showreel
-            </button>
           </div>
 
           <div className="flex items-center gap-10 pt-6 border-t border-border/40">
