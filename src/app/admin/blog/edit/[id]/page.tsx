@@ -18,9 +18,9 @@ import {
   LayoutDashboard,
   FileText,
   Inbox,
-  Settings,
   LogOut,
-  Clock
+  Clock,
+  Upload
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -50,6 +50,8 @@ export default function EditPost() {
     status: "draft",
   });
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   React.useEffect(() => {
     if (!isUserLoading && !user) {
       router.push("/admin/login");
@@ -69,6 +71,17 @@ export default function EditPost() {
     }
   }, [post]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, featuredImageUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !id) return;
@@ -87,7 +100,6 @@ export default function EditPost() {
       publishedAt: formData.status === "published" ? (post?.publishedAt || new Date().toISOString()) : null,
     };
 
-    // 1. Update Master Record
     setDoc(adminRef, updatedData, { merge: true })
       .catch(async (error) => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({
@@ -97,7 +109,6 @@ export default function EditPost() {
         }));
       });
 
-    // 2. Sync to Public Record based on status
     if (formData.status === "published") {
       setDoc(publicRef, updatedData, { merge: true })
         .catch(async (error) => {
@@ -108,7 +119,6 @@ export default function EditPost() {
           }));
         });
     } else {
-      // If unpublished or draft, remove from public
       deleteDoc(publicRef).catch(() => {});
     }
 
@@ -127,26 +137,17 @@ export default function EditPost() {
   };
 
   if (isUserLoading || isPostLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading Studio Data...</div>;
-  }
-
-  if (!post && !isPostLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        <p className="text-xl font-headline font-bold">Article not found.</p>
-        <Button asChild><Link href="/admin/blog">Back to list</Link></Button>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">Loading Article Data...</div>;
   }
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+            <FileText className="w-6 h-6" />
           </div>
-          <span className="font-headline font-bold text-xl">AdminForge</span>
+          <span className="font-headline font-bold text-xl">SS Studio</span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -174,7 +175,7 @@ export default function EditPost() {
         </Button>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full">
@@ -249,28 +250,40 @@ export default function EditPost() {
                       >
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
-                        <option value="archived">Archived</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Featured Image URL</label>
-                      <div className="flex gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Featured Image</label>
+                      <div 
+                        className="relative aspect-video rounded-xl overflow-hidden border-2 border-dashed border-muted-foreground/20 bg-secondary/10 flex flex-col items-center justify-center cursor-pointer hover:bg-secondary/20 transition-all"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {formData.featuredImageUrl ? (
+                          <img src={formData.featuredImageUrl} alt="Preview" className="object-cover w-full h-full" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                            <Upload className="w-8 h-8" />
+                            <span className="text-xs font-bold uppercase">Upload Image</span>
+                          </div>
+                        )}
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Or Image URL</label>
                         <Input
-                          value={formData.featuredImageUrl}
+                          value={formData.featuredImageUrl.startsWith('data:') ? '' : formData.featuredImageUrl}
                           onChange={(e) => setFormData({ ...formData, featuredImageUrl: e.target.value })}
                           placeholder="https://..."
-                          className="bg-secondary/20 border-none"
+                          className="bg-secondary/20 border-none mt-1"
                         />
-                        <Button variant="outline" size="icon" className="shrink-0 rounded-lg">
-                          <ImageIcon className="w-4 h-4" />
-                        </Button>
                       </div>
-                      {formData.featuredImageUrl && (
-                        <div className="mt-2 aspect-video relative rounded-xl overflow-hidden border">
-                          <img src={formData.featuredImageUrl} alt="Preview" className="object-cover w-full h-full" />
-                        </div>
-                      )}
                     </div>
 
                     <div className="pt-4 border-t">
@@ -290,14 +303,6 @@ export default function EditPost() {
                     </div>
                   </CardContent>
                 </Card>
-
-                <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
-                  <div className="flex items-center gap-2 text-primary">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-bold text-sm">SEO Ready</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Changes to status or slug are reflected instantly on your public site.</p>
-                </div>
               </div>
             </div>
           </form>

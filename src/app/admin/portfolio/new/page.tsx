@@ -19,7 +19,8 @@ import {
   Inbox,
   LogOut,
   Clock,
-  Briefcase
+  Briefcase,
+  Upload
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -45,11 +46,24 @@ export default function NewPortfolioProject() {
     tags: "",
   });
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   React.useEffect(() => {
     if (!isUserLoading && !user) {
       router.push("/admin/login");
     }
   }, [user, isUserLoading, router]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,17 +105,17 @@ export default function NewPortfolioProject() {
   };
 
   if (isUserLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">Loading Studio Access...</div>;
   }
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+            <Briefcase className="w-6 h-6" />
           </div>
-          <span className="font-headline font-bold text-xl">AdminForge</span>
+          <span className="font-headline font-bold text-xl">SS Studio</span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -133,7 +147,7 @@ export default function NewPortfolioProject() {
         </Button>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full">
@@ -205,18 +219,35 @@ export default function NewPortfolioProject() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Showcase Image URL</label>
-                      <div className="flex gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Project Image</label>
+                      <div 
+                        className="relative aspect-video rounded-xl overflow-hidden border-2 border-dashed border-muted-foreground/20 bg-secondary/10 flex flex-col items-center justify-center cursor-pointer hover:bg-secondary/20 transition-all"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {formData.imageUrl ? (
+                          <img src={formData.imageUrl} alt="Preview" className="object-cover w-full h-full" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                            <Upload className="w-8 h-8" />
+                            <span className="text-xs font-bold uppercase">Upload File</span>
+                          </div>
+                        )}
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Or Image URL</label>
                         <Input
-                          value={formData.imageUrl}
+                          value={formData.imageUrl.startsWith('data:') ? '' : formData.imageUrl}
                           onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                           placeholder="https://..."
-                          required
-                          className="bg-secondary/20 border-none"
+                          className="bg-secondary/20 border-none mt-1"
                         />
-                        <Button type="button" variant="outline" size="icon" className="shrink-0 rounded-lg">
-                          <ImageIcon className="w-4 h-4" />
-                        </Button>
                       </div>
                     </div>
 
