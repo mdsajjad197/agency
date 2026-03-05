@@ -15,7 +15,8 @@ import {
   TrendingUp,
   Inbox,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Briefcase
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/firebase";
@@ -34,10 +35,12 @@ export default function AdminDashboard() {
   const postsQuery = useMemoFirebase(() => query(collection(db, "admin_blog_posts"), orderBy("createdAt", "desc"), limit(5)), [db]);
   const inquiriesQuery = useMemoFirebase(() => query(collection(db, "inquiries"), orderBy("createdAt", "desc"), limit(5)), [db]);
   const bookingsQuery = useMemoFirebase(() => query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(5)), [db]);
+  const projectsQuery = useMemoFirebase(() => query(collection(db, "portfolio_projects"), orderBy("createdAt", "desc"), limit(5)), [db]);
 
   const { data: recentPosts } = useCollection(postsQuery);
   const { data: recentInquiries } = useCollection(inquiriesQuery);
   const { data: recentBookings } = useCollection(bookingsQuery);
+  const { data: recentProjects } = useCollection(projectsQuery);
 
   if (isUserLoading || !user) return <div className="min-h-screen flex items-center justify-center"><TrendingUp className="animate-spin text-primary" /></div>;
 
@@ -59,6 +62,10 @@ export default function AdminDashboard() {
           <Link href="/admin/dashboard" className="flex items-center gap-3 p-3 bg-primary rounded-xl text-white">
             <LayoutDashboard className="w-5 h-5" />
             Dashboard
+          </Link>
+          <Link href="/admin/portfolio" className="flex items-center gap-3 p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            <Briefcase className="w-5 h-5" />
+            Portfolio
           </Link>
           <Link href="/admin/blog" className="flex items-center gap-3 p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
             <FileText className="w-5 h-5" />
@@ -86,23 +93,32 @@ export default function AdminDashboard() {
               <h1 className="text-3xl font-headline font-bold">Welcome back, Sajjad</h1>
               <p className="text-muted-foreground">Your digital studio at a glance.</p>
             </div>
-            <Button size="lg" className="rounded-full gap-2 shadow-lg" asChild>
-              <Link href="/admin/blog/new"><Plus className="w-5 h-5" /> New Post</Link>
-            </Button>
+            <div className="flex gap-4">
+              <Button variant="outline" className="rounded-full gap-2" asChild>
+                <Link href="/admin/portfolio/new"><Briefcase className="w-4 h-4" /> New Project</Link>
+              </Button>
+              <Button className="rounded-full gap-2 shadow-lg" asChild>
+                <Link href="/admin/blog/new"><Plus className="w-5 h-5" /> New Post</Link>
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card className="border-none shadow-sm bg-white p-6 flex items-center gap-4">
               <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center"><FileText /></div>
               <div><p className="text-xs font-bold uppercase text-muted-foreground">Posts</p><p className="text-2xl font-bold">{recentPosts?.length || 0}</p></div>
             </Card>
             <Card className="border-none shadow-sm bg-white p-6 flex items-center gap-4">
               <div className="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center"><Inbox /></div>
-              <div><p className="text-xs font-bold uppercase text-muted-foreground">New Leads</p><p className="text-2xl font-bold">{recentInquiries?.length || 0}</p></div>
+              <div><p className="text-xs font-bold uppercase text-muted-foreground">Leads</p><p className="text-2xl font-bold">{recentInquiries?.length || 0}</p></div>
             </Card>
             <Card className="border-none shadow-sm bg-white p-6 flex items-center gap-4">
               <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center"><Clock /></div>
               <div><p className="text-xs font-bold uppercase text-muted-foreground">Bookings</p><p className="text-2xl font-bold">{recentBookings?.length || 0}</p></div>
+            </Card>
+            <Card className="border-none shadow-sm bg-white p-6 flex items-center gap-4">
+              <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center"><Briefcase /></div>
+              <div><p className="text-xs font-bold uppercase text-muted-foreground">Projects</p><p className="text-2xl font-bold">{recentProjects?.length || 0}</p></div>
             </Card>
           </div>
 
@@ -127,18 +143,23 @@ export default function AdminDashboard() {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-headline font-bold">Upcoming Bookings</h2>
-                <Button variant="ghost" size="sm" asChild><Link href="/admin/bookings">View All <ArrowRight className="ml-2 w-4 h-4" /></Link></Button>
+                <h2 className="text-xl font-headline font-bold">Latest Projects</h2>
+                <Button variant="ghost" size="sm" asChild><Link href="/admin/portfolio">View All <ArrowRight className="ml-2 w-4 h-4" /></Link></Button>
               </div>
               <Card className="border-none shadow-sm">
                 <div className="divide-y">
-                  {recentBookings?.map(booking => (
-                    <div key={booking.id} className="p-4 flex justify-between items-center hover:bg-secondary/5">
-                      <div><p className="font-bold">{booking.clientName}</p><p className="text-xs text-muted-foreground">{booking.date} @ {booking.time}</p></div>
-                      <Link href="/admin/bookings"><Button variant="outline" size="sm">Manage</Button></Link>
+                  {recentProjects?.map(project => (
+                    <div key={project.id} className="p-4 flex justify-between items-center hover:bg-secondary/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-secondary overflow-hidden">
+                          <img src={project.imageUrl} alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <div><p className="font-bold">{project.title}</p><p className="text-xs text-muted-foreground">{project.category}</p></div>
+                      </div>
+                      <Link href={`/admin/portfolio/edit/${project.id}`}><Button variant="outline" size="sm">Edit</Button></Link>
                     </div>
                   ))}
-                  {!recentBookings?.length && <div className="p-10 text-center text-muted-foreground">No bookings yet.</div>}
+                  {!recentProjects?.length && <div className="p-10 text-center text-muted-foreground">No projects listed.</div>}
                 </div>
               </Card>
             </div>

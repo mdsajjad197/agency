@@ -5,52 +5,26 @@ import * as React from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ExternalLink, ArrowUpRight } from "lucide-react";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
+import { ExternalLink, ArrowUpRight, Briefcase } from "lucide-react";
+import Link from "next/link";
 
-const categories = ["All", "E-commerce", "AI & EdTech", "Marketplace"];
-
-const projects = [
-  {
-    title: "MordenShop",
-    category: "E-commerce",
-    description: "A premium minimalist fashion experience focused on high-conversion and fluid animations.",
-    image: PlaceHolderImages.find(i => i.id === "project-mordenshop"),
-    tags: ["Next.js", "Tailwind", "Framer"],
-    url: "https://mordenshop-1icm.vercel.app/",
-  },
-  {
-    title: "AI Learn",
-    category: "AI & EdTech",
-    description: "Interactive learning platform utilizing generative AI to personalize student curricula.",
-    image: PlaceHolderImages.find(i => i.id === "project-ailearn"),
-    tags: ["AI Integration", "React", "Node.js"],
-    url: "https://ai-learn-topaz.vercel.app",
-  },
-  {
-    title: "Farm Connect",
-    category: "Marketplace",
-    description: "Sustainability-focused platform connecting local farmers directly with urban consumers.",
-    image: PlaceHolderImages.find(i => i.id === "project-farmconnect"),
-    tags: ["Marketplace", "Maps API", "UI/UX"],
-    url: "https://farm-connect-cuye.vercel.app",
-  },
-  {
-    title: "Fruit Shop",
-    category: "E-commerce",
-    description: "A vibrant, lightning-fast digital storefront for organic, farm-fresh produce.",
-    image: PlaceHolderImages.find(i => i.id === "project-fruitshop"),
-    tags: ["Performance", "Visual Design"],
-    url: "https://fruit-shop-caz.vercel.app/",
-  },
-];
+const categories = ["All", "E-commerce", "AI & EdTech", "Marketplace", "Landing Page"];
 
 export function Portfolio() {
+  const db = useFirestore();
   const [activeTab, setActiveTab] = React.useState("All");
 
-  const filteredProjects = projects.filter(
+  const projectsQuery = useMemoFirebase(() => {
+    return query(collection(db, "portfolio_projects"), orderBy("createdAt", "desc"));
+  }, [db]);
+
+  const { data: projects, isLoading } = useCollection(projectsQuery);
+
+  const filteredProjects = projects?.filter(
     (p) => activeTab === "All" || p.category === activeTab
-  );
+  ) || [];
 
   return (
     <section id="portfolio" className="py-32">
@@ -79,61 +53,66 @@ export function Portfolio() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
-          {filteredProjects.map((project, idx) => (
-            <div key={idx} className="group relative space-y-6">
-              <a 
-                href={project.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block relative overflow-hidden rounded-[2.5rem] bg-secondary/20 aspect-[16/10] shadow-xl group-hover:shadow-2xl transition-all duration-500"
-              >
-                {project.image && (
-                  <Image
-                    src={project.image.imageUrl}
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 gap-12">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="aspect-[16/10] bg-secondary/20 rounded-[2.5rem] animate-pulse" />
+            ))}
+          </div>
+        ) : filteredProjects.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-12">
+            {filteredProjects.map((project, idx) => (
+              <div key={project.id} className="group relative space-y-6">
+                <a 
+                  href={project.projectUrl || "#"} 
+                  target={project.projectUrl ? "_blank" : "_self"}
+                  rel="noopener noreferrer"
+                  className="block relative overflow-hidden rounded-[2.5rem] bg-secondary/20 aspect-[16/10] shadow-xl group-hover:shadow-2xl transition-all duration-500"
+                >
+                  <img
+                    src={project.imageUrl}
                     alt={project.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
-                    data-ai-hint={project.image.imageHint}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-1000 ease-out"
                   />
-                )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                  <div className="rounded-full h-16 w-16 bg-white text-black flex items-center justify-center shadow-lg">
-                    <ArrowUpRight className="w-8 h-8" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                    <div className="rounded-full h-16 w-16 bg-white text-black flex items-center justify-center shadow-lg">
+                      <ArrowUpRight className="w-8 h-8" />
+                    </div>
                   </div>
-                </div>
-              </a>
-              
-              <div className="px-2 flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <a 
-                    href={project.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="hover:text-primary transition-colors"
-                  >
+                </a>
+                
+                <div className="px-2 flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
                     <h4 className="text-3xl font-headline font-bold tracking-tight">
                       {project.title}
                     </h4>
-                  </a>
-                  <Badge variant="outline" className="rounded-full border-primary/20 text-primary">
-                    {project.category}
-                  </Badge>
-                </div>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  {project.description}
-                </p>
-                <div className="flex gap-4 pt-2">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 border-b border-transparent hover:border-primary/40 hover:text-primary transition-all cursor-default">
-                      {tag}
-                    </span>
-                  ))}
+                    <Badge variant="outline" className="rounded-full border-primary/20 text-primary">
+                      {project.category}
+                    </Badge>
+                  </div>
+                  <p className="text-muted-foreground text-lg leading-relaxed">
+                    {project.description}
+                  </p>
+                  {project.tags && project.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      {project.tags.map((tag: string) => (
+                        <span key={tag} className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-20 text-center bg-secondary/10 rounded-3xl">
+            <Briefcase className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+            <h2 className="text-2xl font-headline font-bold">No projects found in this category.</h2>
+            <p className="text-muted-foreground mt-2">Check back soon for new case studies.</p>
+          </div>
+        )}
 
         <div className="mt-20 text-center">
           <Button variant="outline" size="lg" className="rounded-full h-14 px-10 border-2 group" asChild>
@@ -147,5 +126,3 @@ export function Portfolio() {
     </section>
   );
 }
-
-import Link from "next/link";

@@ -33,6 +33,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /portfolio_projects/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /inquiries/{id} {
       allow create: if true;
       allow read, write: if isAdmin();

@@ -31,6 +31,23 @@
       },
       "required": ["id", "title", "slug", "content", "status", "createdAt"]
     },
+    "PortfolioProject": {
+      "title": "PortfolioProject",
+      "type": "object",
+      "description": "Showcase project in the portfolio.",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "projectUrl": { "type": "string", "format": "uri" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "category", "description", "imageUrl", "createdAt"]
+    },
     "Inquiry": {
       "title": "Inquiry",
       "type": "object",
@@ -71,6 +88,7 @@
     "/admin_roles/{uid}": { "schema": "object", "description": "Authorization flags" },
     "/public_blog_posts/{postId}": { "schema": "BlogPost", "description": "Live articles" },
     "/admin_blog_posts/{postId}": { "schema": "BlogPost", "description": "Master articles" },
+    "/portfolio_projects/{id}": { "schema": "PortfolioProject", "description": "Agency portfolio items" },
     "/inquiries/{id}": { "schema": "Inquiry", "description": "Leads" },
     "/bookings/{id}": { "schema": "Booking", "description": "Appointments" }
   }
