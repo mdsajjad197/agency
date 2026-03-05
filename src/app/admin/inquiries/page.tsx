@@ -13,6 +13,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function InquiriesManager() {
   const db = useFirestore();
@@ -20,6 +30,8 @@ export default function InquiriesManager() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) router.push("/admin/login");
@@ -31,17 +43,18 @@ export default function InquiriesManager() {
 
   const { data: inquiries, isLoading } = useCollection(inquiriesQuery);
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Delete this inquiry?")) return;
-    const docRef = doc(db, "inquiries", id);
+  const confirmDelete = () => {
+    if (!deleteId) return;
+    const docRef = doc(db, "inquiries", deleteId);
     deleteDocumentNonBlocking(docRef);
-    toast({ title: "Deletion initiated" });
+    toast({ title: "Inquiry removed" });
+    setDeleteId(null);
   };
 
   const handleStatusUpdate = (id: string, status: string) => {
     const docRef = doc(db, "inquiries", id);
     updateDocumentNonBlocking(docRef, { status });
-    toast({ title: "Status update initiated" });
+    toast({ title: "Status updated" });
   };
 
   const handleLogout = async () => {
@@ -152,7 +165,7 @@ export default function InquiriesManager() {
                           variant="ghost" 
                           size="sm" 
                           className="rounded-lg gap-2 text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDelete(lead.id)}
+                          onClick={() => setDeleteId(lead.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                           Remove
@@ -169,6 +182,24 @@ export default function InquiriesManager() {
             )}
           </div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Inquiry?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will delete the lead record from your dashboard. This action is permanent.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+                Delete Record
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );

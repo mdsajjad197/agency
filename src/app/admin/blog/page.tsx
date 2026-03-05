@@ -16,7 +16,7 @@ import {
   Eye, 
   LayoutDashboard, 
   Inbox, 
-  Settings, 
+  Clock,
   LogOut,
   MoreVertical
 } from "lucide-react";
@@ -30,6 +30,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function BlogManagement() {
   const { user, isUserLoading } = useUser();
@@ -37,6 +47,8 @@ export default function BlogManagement() {
   const db = useFirestore();
   const auth = useAuth();
   const { toast } = useToast();
+
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) {
@@ -50,20 +62,21 @@ export default function BlogManagement() {
 
   const { data: posts, isLoading } = useCollection(postsQuery);
 
-  const handleDelete = (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
+  const confirmDelete = () => {
+    if (!deleteId) return;
 
-    const adminRef = doc(db, "admin_blog_posts", postId);
-    const publicRef = doc(db, "public_blog_posts", postId);
+    const adminRef = doc(db, "admin_blog_posts", deleteId);
+    const publicRef = doc(db, "public_blog_posts", deleteId);
 
-    // Initiating non-blocking deletions
+    // Initiating non-blocking deletions for both master and public records
     deleteDocumentNonBlocking(adminRef);
     deleteDocumentNonBlocking(publicRef);
 
     toast({
-      title: "Deletion initiated",
-      description: "The post removal is being processed.",
+      title: "Deletion task started",
+      description: "The article is being removed from all collections.",
     });
+    setDeleteId(null);
   };
 
   const handleLogout = async () => {
@@ -99,7 +112,7 @@ export default function BlogManagement() {
             Inquiries
           </Link>
           <Link href="/admin/bookings" className="flex items-center gap-3 p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-            <Settings className="w-5 h-5" />
+            <Clock className="w-5 h-5" />
             Bookings
           </Link>
         </nav>
@@ -182,7 +195,7 @@ export default function BlogManagement() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     className="text-destructive focus:text-destructive cursor-pointer" 
-                                    onClick={() => handleDelete(post.id)}
+                                    onClick={() => setDeleteId(post.id)}
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" /> Delete
                                   </DropdownMenuItem>
@@ -212,6 +225,25 @@ export default function BlogManagement() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the blog post
+                from both your master records and the public website.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+                Delete Article
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );

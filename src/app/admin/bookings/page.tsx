@@ -13,6 +13,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function BookingsManager() {
   const db = useFirestore();
@@ -20,6 +30,8 @@ export default function BookingsManager() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) router.push("/admin/login");
@@ -31,16 +43,17 @@ export default function BookingsManager() {
 
   const { data: bookings, isLoading } = useCollection(bookingsQuery);
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to cancel this booking?")) return;
+  const confirmDelete = () => {
+    if (!deleteId) return;
     
-    const docRef = doc(db, "bookings", id);
+    const docRef = doc(db, "bookings", deleteId);
     deleteDocumentNonBlocking(docRef);
 
     toast({ 
-      title: "Deletion initiated", 
-      description: "The appointment removal is being processed." 
+      title: "Deletion task started", 
+      description: "The appointment removal is being processed in the background." 
     });
+    setDeleteId(null);
   };
 
   const handleLogout = async () => {
@@ -126,7 +139,7 @@ export default function BookingsManager() {
                       variant="ghost" 
                       size="icon" 
                       className="text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDelete(booking.id)}
+                      onClick={() => setDeleteId(booking.id)}
                     >
                       <Trash2 className="w-5 h-5" />
                     </Button>
@@ -140,6 +153,24 @@ export default function BookingsManager() {
             )}
           </div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancel Appointment?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action will permanently remove this booking record. The client will not be automatically notified of the cancellation.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Keep Booking</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+                Confirm Cancellation
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
