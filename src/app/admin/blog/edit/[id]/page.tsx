@@ -2,9 +2,9 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { useUser, useFirestore } from "@/firebase";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { useRouter, useParams } from "next/navigation";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { doc, setDoc, deleteDoc, collection } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,12 +29,16 @@ import { signOut } from "firebase/auth";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
-export default function NewPost() {
+export default function EditPost() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const { id } = useParams();
   const db = useFirestore();
   const auth = useAuth();
   const { toast } = useToast();
+
+  const postRef = useMemoFirebase(() => doc(db, "admin_blog_posts", id as string), [db, id]);
+  const { data: post, isLoading: isPostLoading } = useDoc(postRef);
 
   const [loading, setLoading] = React.useState(false);
   const [formData, setFormData] = React.useState({
@@ -52,51 +56,67 @@ export default function NewPost() {
     }
   }, [user, isUserLoading, router]);
 
+  React.useEffect(() => {
+    if (post) {
+      setFormData({
+        title: post.title || "",
+        slug: post.slug || "",
+        excerpt: post.excerpt || "",
+        content: post.content || "",
+        featuredImageUrl: post.featuredImageUrl || "",
+        status: post.status || "draft",
+      });
+    }
+  }, [post]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !id) return;
     
     setLoading(true);
-    const postId = doc(collection(db, "admin_blog_posts")).id;
+    const postId = id as string;
     const adminRef = doc(db, "admin_blog_posts", postId);
     const publicRef = doc(db, "public_blog_posts", postId);
 
-    const postData = {
+    const updatedData = {
       ...formData,
       id: postId,
       authorId: user.uid,
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      publishedAt: formData.status === "published" ? new Date().toISOString() : null,
+      createdAt: post?.createdAt || new Date().toISOString(),
+      publishedAt: formData.status === "published" ? (post?.publishedAt || new Date().toISOString()) : null,
     };
 
-    // 1. Save to master collection (non-blocking)
-    setDoc(adminRef, postData)
+    // 1. Update Master Record
+    setDoc(adminRef, updatedData, { merge: true })
       .catch(async (error) => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: adminRef.path,
-          operation: 'create',
-          requestResourceData: postData,
+          operation: 'update',
+          requestResourceData: updatedData,
         }));
       });
 
-    // 2. If published, sync to public collection (non-blocking)
+    // 2. Sync to Public Record based on status
     if (formData.status === "published") {
-      setDoc(publicRef, postData)
+      setDoc(publicRef, updatedData, { merge: true })
         .catch(async (error) => {
           errorEmitter.emit('permission-error', new FirestorePermissionError({
             path: publicRef.path,
-            operation: 'create',
-            requestResourceData: postData,
+            operation: 'write',
+            requestResourceData: updatedData,
           }));
         });
+    } else {
+      // If unpublished or draft, remove from public
+      deleteDoc(publicRef).catch(() => {});
     }
 
     toast({
-      title: "Success",
-      description: "Post created successfully.",
+      title: "Saving changes",
+      description: "Your updates are being synchronized.",
     });
-    
+
     router.push("/admin/blog");
     setLoading(false);
   };
@@ -106,8 +126,17 @@ export default function NewPost() {
     router.push("/admin/login");
   };
 
-  if (isUserLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (isUserLoading || isPostLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading Studio Data...</div>;
+  }
+
+  if (!post && !isPostLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
+        <p className="text-xl font-headline font-bold">Article not found.</p>
+        <Button asChild><Link href="/admin/blog">Back to list</Link></Button>
+      </div>
+    );
   }
 
   return (
@@ -151,7 +180,7 @@ export default function NewPost() {
             <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full">
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-3xl font-headline font-bold">New Blog Post</h1>
+            <h1 className="text-3xl font-headline font-bold">Edit Post</h1>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -249,11 +278,11 @@ export default function NewPost() {
                         {loading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
+                            Updating...
                           </>
                         ) : (
                           <>
-                            Save Article
+                            Update Article
                             <Save className="ml-2 w-4 h-4" />
                           </>
                         )}
@@ -267,7 +296,7 @@ export default function NewPost() {
                     <CheckCircle className="w-5 h-5" />
                     <span className="font-bold text-sm">SEO Ready</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Your slug and title are automatically checked for SEO compatibility.</p>
+                  <p className="text-xs text-muted-foreground">Changes to status or slug are reflected instantly on your public site.</p>
                 </div>
               </div>
             </div>
