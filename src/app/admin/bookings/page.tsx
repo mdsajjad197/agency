@@ -3,17 +3,16 @@
 
 import * as React from "react";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, doc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare, Loader2 } from "lucide-react";
+import { Mail, Trash2, LayoutDashboard, FileText, Inbox, LogOut, Clock, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function BookingsManager() {
   const db = useFirestore();
@@ -36,17 +35,10 @@ export default function BookingsManager() {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
     
     const docRef = doc(db, "bookings", id);
-
-    deleteDoc(docRef)
-      .catch(async (error) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'delete',
-        }));
-      });
+    deleteDocumentNonBlocking(docRef);
 
     toast({ 
-      title: "Cancellation initiated", 
+      title: "Deletion initiated", 
       description: "The appointment removal is being processed." 
     });
   };
@@ -60,7 +52,6 @@ export default function BookingsManager() {
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">

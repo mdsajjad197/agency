@@ -4,7 +4,8 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -23,8 +24,6 @@ import Link from "next/link";
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,24 +56,9 @@ export default function BlogManagement() {
     const adminRef = doc(db, "admin_blog_posts", postId);
     const publicRef = doc(db, "public_blog_posts", postId);
 
-    // Delete from Master
-    deleteDoc(adminRef).catch(async () => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: adminRef.path,
-        operation: 'delete',
-      }));
-    });
-
-    // Delete from Public
-    deleteDoc(publicRef).catch(async (err: any) => {
-      // Only report if it's not a 'not-found' error
-      if (err.code !== 'not-found') {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: publicRef.path,
-          operation: 'delete',
-        }));
-      }
-    });
+    // Initiating non-blocking deletions
+    deleteDocumentNonBlocking(adminRef);
+    deleteDocumentNonBlocking(publicRef);
 
     toast({
       title: "Deletion initiated",
@@ -93,7 +77,6 @@ export default function BlogManagement() {
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
-      {/* Admin Sidebar */}
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
@@ -127,7 +110,6 @@ export default function BlogManagement() {
         </Button>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex justify-between items-center">

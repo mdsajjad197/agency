@@ -3,7 +3,8 @@
 
 import * as React from "react";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
+import { deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Inbox, Mail, User, Clock, Trash2, CheckCircle, LayoutDashboard, FileText, LogOut, MessageSquare } from "lucide-react";
@@ -12,8 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function InquiriesManager() {
   const db = useFirestore();
@@ -35,24 +34,13 @@ export default function InquiriesManager() {
   const handleDelete = (id: string) => {
     if (!confirm("Delete this inquiry?")) return;
     const docRef = doc(db, "inquiries", id);
-    deleteDoc(docRef).catch(async () => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'delete',
-      }));
-    });
-    toast({ title: "Removal initiated" });
+    deleteDocumentNonBlocking(docRef);
+    toast({ title: "Deletion initiated" });
   };
 
   const handleStatusUpdate = (id: string, status: string) => {
     const docRef = doc(db, "inquiries", id);
-    updateDoc(docRef, { status }).catch(async () => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'update',
-        requestResourceData: { status }
-      }));
-    });
+    updateDocumentNonBlocking(docRef, { status });
     toast({ title: "Status update initiated" });
   };
 
@@ -65,7 +53,6 @@ export default function InquiriesManager() {
 
   return (
     <div className="min-h-screen bg-secondary/20 flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-foreground text-white p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">

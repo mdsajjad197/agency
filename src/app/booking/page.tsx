@@ -9,11 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useFirestore } from "@/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection } from "firebase/firestore";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Clock, Loader2, Phone, MessageSquare } from "lucide-react";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function BookingPage() {
   const db = useFirestore();
@@ -41,19 +40,13 @@ export default function BookingPage() {
       createdAt: new Date().toISOString()
     };
 
-    addDoc(collection(db, "bookings"), bookingData)
-      .then(() => {
-        setSuccess(true);
-        setLoading(false);
-      })
-      .catch(async (error) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: 'bookings',
-          operation: 'create',
-          requestResourceData: bookingData,
-        }));
-        setLoading(false);
-      });
+    addDocumentNonBlocking(collection(db, "bookings"), bookingData);
+    
+    // Simulate immediate feedback while background task runs
+    setTimeout(() => {
+      setSuccess(true);
+      setLoading(false);
+    }, 500);
   };
 
   const timeSlots = ["10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
