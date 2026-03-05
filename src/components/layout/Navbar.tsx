@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -39,7 +38,7 @@ export function Navbar() {
             <Rocket className="text-primary-foreground group-hover:text-accent-foreground w-6 h-6" />
           </div>
           <span className="text-xl font-headline font-bold tracking-tight">
-            Studio<span className="text-primary">Forge</span>
+            SS<span className="text-primary"> Studio</span>
           </span>
         </Link>
 

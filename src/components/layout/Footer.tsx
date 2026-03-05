@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { Rocket } from "lucide-react";
 
@@ -13,7 +12,7 @@ export function Footer() {
                 <Rocket className="text-white w-6 h-6" />
               </div>
               <span className="text-2xl font-headline font-bold tracking-tight">
-                StudioForge
+                SS Studio
               </span>
             </Link>
             <p className="text-white/60 leading-relaxed max-w-xs">
@@ -43,7 +42,7 @@ export function Footer() {
         </div>
 
         <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between gap-6 text-white/40 text-sm font-medium">
-          <p>© {new Date().getFullYear()} StudioForge (SS Studio). All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SS Studio. All rights reserved.</p>
           <div className="flex gap-8">
             <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
