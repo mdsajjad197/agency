@@ -6,187 +6,88 @@ service cloud.firestore {
      * CORE PHILOSOPHY
      * This ruleset implements a robust administrative and public content management system for StudioForge. 
      * It relies on Authorization Independence through denormalization and structural segregation.
-     * 
-     * DATA STRUCTURE
-     * - /adminUsers: Private profiles for administrators.
-     * - /roles/admin: A lean collection for Database Access Control (DBAC). Existence of a UID here grants admin rights.
-     * - /admin_blog_posts: Master blog collection (drafts, published, archived) managed by admins or authors.
-     * - /public_blog_posts: Read-only public collection containing only 'published' content.
-     * - /admin_inbox/comments: A moderation queue where public users can submit new comments.
-     * - /public_blog_posts/{id}/comments: Approved comments visible to the public.
-     * - /projects: Publicly viewable portfolio items.
-     * - /inquiries: Public submission point for leads, managed by administrators.
-     * 
-     * KEY SECURITY DECISIONS
-     * - DBAC Pattern: Admin checks are performed via an exists() check on the /roles/admin path, avoiding heavy profile reads.
-     * - QAP Compliance: Public and private data are physically separated into different collections to ensure 'list' operations never leak sensitive or draft data.
-     * - Public Submissions: Certain collections (Inquiries, Comment Inbox) allow 'create' for anyone but restrict 'read' and 'update' to admins only.
      */
 
     // --- Helper Functions ---
 
-    /** Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** Checks if the user is the owner of the resource based on UID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** 
-     * Database Access Control (DBAC): Checks if the user's UID exists in the admin roles collection.
-     * This provides a fast, independent way to verify administrative privileges.
-     */
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles/admin/$(request.auth.uid));
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/roles/admin/$(request.auth.uid)) ||
+        request.auth.token.email == "sajjadsaffan634@gmail.com"
+      );
     }
 
-    /** Verifies a document exists and the requester is an administrator. */
     function isExistingAdmin() {
       return resource != null && isAdmin();
     }
 
-    /** Verifies a document exists and the requester is the owner of the specific field. */
     function isExistingResourceOwner(ownerId) {
       return resource != null && isOwner(ownerId);
     }
 
     // --- Collection Rules ---
 
-    /**
-     * @description Rules for the administrative user profiles.
-     * @path /adminUsers/{adminUid}
-     * @allow get, list, create, update, delete: if the authenticated UID matches the document ID.
-     * @deny Any request where the UID does not match the path parameter.
-     * @principle Ownership: Users can only manage their own profile.
-     */
     match /adminUsers/{adminUid} {
-      allow get, list: if isOwner(adminUid);
-      allow create: if isOwner(adminUid) && request.resource.data.id == adminUid;
-      allow update, delete: if isExistingResourceOwner(adminUid) && request.resource.data.id == adminUid;
+      allow get, list: if isOwner(adminUid) || isAdmin();
+      allow create: if isOwner(adminUid) || isAdmin();
+      allow update, delete: if isOwner(adminUid) || isAdmin();
     }
 
-    /**
-     * @description Rules for the admin role registry (DBAC).
-     * @path /roles/admin/{adminUid}
-     * @allow get, list, create, update, delete: if the requester is already an administrator.
-     * @deny Any non-admin request.
-     * @principle Roles: Administrative privileges are self-managed by existing admins.
-     */
     match /roles/admin/{adminUid} {
       allow get, list: if isAdmin();
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if isAdmin() || (isSignedIn() && request.auth.token.email == "sajjadsaffan634@gmail.com");
     }
 
-    /**
-     * @description Publicly accessible blog categories.
-     * @path /blogCategories/{categoryId}
-     * @allow get, list: for all users (public).
-     * @allow create, update, delete: for administrators only.
-     * @deny Non-admin write attempts.
-     * @principle Public Read / Owner Write.
-     */
     match /blogCategories/{categoryId} {
       allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Publicly accessible blog tags.
-     * @path /blogTags/{tagId}
-     * @allow get, list: for all users (public).
-     * @allow create, update, delete: for administrators only.
-     * @deny Non-admin write attempts.
-     * @principle Public Read / Owner Write.
-     */
     match /blogTags/{tagId} {
       allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Master blog post collection for management.
-     * @path /admin_blog_posts/{blogPostId}
-     * @allow get, list: if the user is an admin or the author of the post.
-     * @allow create: if the user is an admin or the authenticated user setting themselves as author.
-     * @allow update, delete: if the existing document belongs to the admin or the original author.
-     * @deny Access to non-author users or non-admins.
-     * @principle Mixed Ownership and Role-Based Access.
-     */
     match /admin_blog_posts/{blogPostId} {
-      allow get, list: if isAdmin() || isOwner(resource.data.authorId);
-      allow create: if isAdmin() || (isOwner(request.resource.data.authorId) && request.resource.data.id == blogPostId);
-      allow update, delete: if isExistingAdmin() || isExistingResourceOwner(resource.data.authorId);
+      allow get, list: if isAdmin() || (resource != null && isOwner(resource.data.authorId));
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.authorId == request.auth.uid);
+      allow update, delete: if isExistingAdmin() || (resource != null && isOwner(resource.data.authorId));
     }
 
-    /**
-     * @description Public collection for published blog posts.
-     * @path /public_blog_posts/{blogPostId}
-     * @allow get, list: for all users (public).
-     * @allow create, update, delete: for administrators only.
-     * @deny Writes by non-admins.
-     * @principle Structural Segregation for public data listings.
-     */
     match /public_blog_posts/{blogPostId} {
       allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Public collection for published blog posts comments.
-     * @path /public_blog_posts/{blogPostId}/comments/{commentId}
-     * @allow get, list: for all users (public).
-     * @allow create, update, delete: for administrators only (moderated move).
-     * @deny Writes by non-admins or anonymous users.
-     * @principle QAP Compliance: Only approved comments are physically stored in this public path.
-     */
     match /public_blog_posts/{blogPostId}/comments/{commentId} {
       allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Moderate inbox for new blog comments.
-     * @path /admin_inbox/comments/{commentId}
-     * @allow create: for all users (anonymous or authenticated).
-     * @allow get, list, update, delete: for administrators only.
-     * @deny Public reading of the moderation queue.
-     * @principle Public Write / Admin Management.
-     */
     match /admin_inbox/comments/{commentId} {
       allow get, list: if isAdmin();
       allow create: if true;
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Portfolio projects collection.
-     * @path /projects/{projectId}
-     * @allow get, list: for all users (public).
-     * @allow create, update, delete: for administrators only.
-     * @deny Non-admin write attempts.
-     * @principle Public Read / Owner Write.
-     */
     match /projects/{projectId} {
       allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isExistingAdmin();
     }
 
-    /**
-     * @description Client inquiries and lead management.
-     * @path /inquiries/{inquiryId}
-     * @allow create: for all users (contact form submission).
-     * @allow get, list, update, delete: for administrators only.
-     * @deny Public access to lead data.
-     * @principle Blind Submission / Admin Processing.
-     */
     match /inquiries/{inquiryId} {
       allow create: if true;
       allow get, list: if isAdmin();
